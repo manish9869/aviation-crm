@@ -8,6 +8,7 @@ import { ResponseHandlerInterceptor } from './helpers/ResponseHandlerInterceptor
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import helmet from 'helmet';
 import * as dotenv from 'dotenv';
+import { createConnection } from 'typeorm';
 dotenv.config();
 
 async function bootstrap() {
@@ -19,6 +20,7 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
   app.use(helmet());
+
   const { httpAdapter } = app.get(HttpAdapterHost);
 
   app.setGlobalPrefix(`/api/${process.env.API_PREFIX}`);
@@ -35,6 +37,7 @@ async function bootstrap() {
     methods: ['GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'],
     credentials: true,
   });
+
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ResponseHandlerInterceptor());
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapter));
