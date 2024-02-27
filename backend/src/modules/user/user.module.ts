@@ -10,6 +10,9 @@ import { UserController } from './controller/user/user.controller';
 import { UserTypeController } from './controller/user-type/user-type.controller';
 import { UserService } from './service/user/user.service';
 import { UserTypeService } from './service/user-type/user-type.service';
+import { SellerService } from './service/seller/seller.service';
+import { SellerController } from './controller/seller/seller.controller';
+import { Seller } from './entities/seller.entity';
 
 @Module({
   imports: [
@@ -17,9 +20,10 @@ import { UserTypeService } from './service/user-type/user-type.service';
     TypeOrmModule.forFeature([Roles]),
     TypeOrmModule.forFeature([UserType]),
     TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([Seller]),
   ],
-  controllers: [RolesController, UserController, UserTypeController],
-  providers: [Logger, RolesService, UserService, UserTypeService],
-  exports: [RolesService, UserService, UserTypeService],
+  controllers: [RolesController, UserController, UserTypeController, SellerController],
+  providers: [Logger, RolesService, UserService, UserTypeService, SellerService],
+  exports: [RolesService, UserService, UserTypeService, SellerService], 
 })
 export class UserModule {}
