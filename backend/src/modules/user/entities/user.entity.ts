@@ -15,11 +15,11 @@ export class User {
 
   @ManyToOne(() => Roles, { eager: true })
   @JoinColumn({ name: 'role_id' })
-  role: Roles;
+  role: number;
 
   @ManyToOne(() => UserType, { eager: true })
   @JoinColumn({ name: 'user_type_id' })
-  user_type: UserType;
+  user_type: number;
 
   @Column({ length: 45, nullable: false })
   firstname: string;

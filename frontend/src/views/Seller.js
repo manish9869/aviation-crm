@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CommonHeader from "components/Headers/CommonHeader";
 import {
   Card,
@@ -11,60 +11,122 @@ import {
   Col,
   Button,
   Input,
+  Label,
   InputGroupAddon,
   InputGroupText,
   InputGroup,
 } from "reactstrap";
 
 import { AgGridReact } from "ag-grid-react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Seller = () => {
-  const data = [
-    { make: "BMW", model: "M3", price: 70000 },
-    { make: "Toyota", model: "Corolla", price: 25000 },
-    { make: "Tesla", model: "Model S Plaid", price: 120000 },
-    { make: "BMW", model: "M4", price: 70000 },
-    { make: "Toyota", model: "Camry", price: 25000 },
-    { make: "Tesla", model: "Model 3 ", price: 60000 },
-    { make: "BMW", model: "M5", price: 170000 },
-    { make: "Toyota", model: "Corolla", price: 25000 },
-    { make: "Tesla", model: "Model Y", price: 60000 },
-    { make: "BMW", model: "M3", price: 70000 },
-    { make: "Toyota", model: "Corolla", price: 25000 },
-    { make: "Tesla", model: "Model S Plaid", price: 120000 },
-    { make: "BMW", model: "M3", price: 70000 },
-    { make: "Toyota", model: "Corolla", price: 25000 },
-    { make: "Tesla", model: "Model S Plaid", price: 120000 },
-    { make: "BMW", model: "M3", price: 70000 },
-    { make: "Toyota", model: "Corolla", price: 25000 },
-    { make: "Tesla", model: "Model S Plaid", price: 120000 },
-    { make: "BMW", model: "M3", price: 70000 },
-    { make: "Toyota", model: "Corolla", price: 25000 },
-    { make: "Tesla", model: "Model S Plaid", price: 120000 },
-  ];
+  const navigate = useNavigate();
+
+  const [sellers, setSellers] = useState([]);
+  const [error, setError] = useState(false);
+
+  const [seller_commerical_name, setSellerCommericalName] = useState();
+  const [seller_legal_name, setSellerLegalName] = useState();
+  const [address, setAddress] = useState();
+  const [tax_identification_number, setTaxIdentificationNumber] = useState();
+  const [contact_email, setEmail] = useState();
+  const [contact_name, setContactName] = useState();
+  const [contact_phone_number, setContactPhoneNumber] = useState();
+  const [aoc_file, setAOC] = useState();
+  const [legal_notary_file, setLegal] = useState();
+  const [enable, setEnable] = useState();
+
+  const handleEnableValue = (e) => {
+    // Parse the input value to a number
+    const enableValue = parseInt(e.target.value, 10);
+    setEnable(enableValue);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post("/seller", {
+        seller_commerical_name,
+        seller_legal_name,
+        address,
+        tax_identification_number,
+        contact_email,
+        contact_name,
+        contact_phone_number,
+        aoc_file,
+        legal_notary_file,
+        enable,
+      })
+      .then((result) => {
+        console.log(result);
+        navigate("/admin/index");
+      })
+      .catch((err) => console.log(err));
+  };
+
+  // useEffect(() => {
+  //   (async () => {
+  //     try {
+  //       setError(false);
+  //       const response = await axios.get("/seller");
+  //       console.log("seller get-=====>", response.data.data);
+  //       setSellers(response.data.data);
+
+  //     } catch (error) {
+  //       setError(true);
+  //     }
+  //   })();
+  // }, []);
+
+  const [rowData, setRowData] = useState();
+
+  const onGridReady = (params) => {
+    axios.get("/seller").then((data) => {
+      console.log("Data => " + data.data);
+      setRowData(data.data);
+    });
+  };
 
   const myColDefs = [
-    { headerName: "Make", field: "make", sortable: true, filter: true },
-    { headerName: "Model", field: "model", sortable: true, filter: true },
-    { headerName: "Price (USD)", field: "price", sortable: true, filter: true },
+    {
+      headerName: "Commerical Name",
+      field: "seller_commerical_name",
+      sortable: true,
+      filter: true,
+    },
+    {
+      headerName: "Contact Name",
+      field: "contact_name",
+      sortable: true,
+      filter: true,
+    },
+    {
+      headerName: "Contact Email",
+      field: "contact_email",
+      sortable: true,
+      filter: true,
+    },
   ];
 
   const gridOptions = {
     // PROPERTIES
     // Objects like myRowData and myColDefs would be created in your application
-    rowData: data,
+    rowData: sellers,
     columnDefs: myColDefs,
     pagination: true,
     // paginationAutoPageSize: false,
     paginationPageSize: 15,
     paginationPageSizeSelector: [15, 20, 50, 100],
     rowSelection: "single",
+    // onGridReady={onGridReady},
 
     // EVENTS
     // Add event handlers
     onRowClicked: (event) => console.log("A row was clicked"),
     onColumnResized: (event) => console.log("A column was resized"),
-    onGridReady: (event) => console.log("The grid is now ready"),
+    onGridReady: onGridReady,
 
     // CALLBACKS
     isScrollLag: () => false,
@@ -86,88 +148,121 @@ const Seller = () => {
               <CardBody>
                 <Form role="form">
                   <FormGroup>
+                    <Label
+                      className="custom-label"
+                      for="seller_commerical_name"
+                    >
+                      Seller Commercial Name
+                    </Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      <Input placeholder="Seller Commercial Name" type="text" />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputGroup className="input-group-alternative mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-hat-3" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input placeholder="Seller Legal Name" type="text" />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputGroup className="input-group-alternative mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-hat-3" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input placeholder="Address" type="text" />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputGroup className="input-group-alternative mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-hat-3" />
-                        </InputGroupText>
-                      </InputGroupAddon>
                       <Input
-                        placeholder="Tax Identification Number"
+                        id="seller_commerical_name"
+                        placeholder="Seller Commercial Name"
                         type="text"
+                        onChange={(e) =>
+                          setSellerCommericalName(e.target.value)
+                        }
                       />
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
+                    <Label for="seller_legal_name">Seller Legal Name</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-email-83" />
-                        </InputGroupText>
-                      </InputGroupAddon>
                       <Input
+                        id="seller_legal_name"
+                        placeholder="Seller Legal Name"
+                        type="text"
+                        onChange={(e) => setSellerLegalName(e.target.value)}
+                      />
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="address">Address</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="address"
+                        placeholder="Address"
+                        type="text"
+                        onChange={(e) => setAddress(e.target.value)}
+                      />
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="id_number">Tax Identification Number</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="id_number"
+                        placeholder="Tax Identification Number"
+                        type="text"
+                        onChange={(e) =>
+                          setTaxIdentificationNumber(e.target.value)
+                        }
+                      />
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="contactemail">Contact Email</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="contactemail"
                         placeholder="Contact Email"
                         type="email"
                         autoComplete="new-email"
+                        onChange={(e) => setEmail(e.target.value)}
                       />
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
+                    <Label for="contactname">Contact Name</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-hat-3" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input placeholder="Contact Name" type="text" />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputGroup className="input-group-alternative mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-hat-3" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input placeholder="Contact Phone Number" type="text" />
-                    </InputGroup>
-                  </FormGroup>
-                  <FormGroup>
-                    <InputGroup className="input-group-alternative">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-lock-circle-open" />
-                        </InputGroupText>
-                      </InputGroupAddon>
                       <Input
-                        placeholder="Password"
-                        type="password"
-                        autoComplete="new-password"
+                        id="contactname"
+                        placeholder="Contact Name"
+                        type="text"
+                        onChange={(e) => setContactName(e.target.value)}
+                      />
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="contactPhoneNumber">Contact Phone Number</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="contactPhoneNumber"
+                        placeholder="Contact Phone Number"
+                        type="text"
+                        onChange={(e) => setContactPhoneNumber(e.target.value)}
+                      />
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="aoc_file">AOC File</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="aoc_file"
+                        placeholder="AOC File"
+                        type="text"
+                        onChange={(e) => setAOC(e.target.value)}
+                      />
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="legal_notary_file">Legal Notary File</Label>
+                    <InputGroup className="input-group-alternative">
+                      <Input
+                        placeholder="Legal Notary File"
+                        type="text"
+                        onChange={(e) => setLegal(e.target.value)}
+                      />
+                    </InputGroup>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="enable">Enable</Label>
+                    <InputGroup className="input-group-alternative">
+                      <Input
+                        placeholder="enable"
+                        type="number"
+                        value={enable}
+                        onChange={handleEnableValue}
                       />
                     </InputGroup>
                   </FormGroup>
@@ -201,7 +296,12 @@ const Seller = () => {
                     <Button className="mt-4" color="danger" type="button">
                       Clear
                     </Button>
-                    <Button className="mt-4" color="primary" type="button">
+                    <Button
+                      className="mt-4"
+                      color="primary"
+                      type="button"
+                      onClick={handleSubmit}
+                    >
                       Submit
                     </Button>
                   </div>

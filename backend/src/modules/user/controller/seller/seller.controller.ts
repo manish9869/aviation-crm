@@ -25,7 +25,7 @@ import {
     try {
       return await this.sellerService.create(createSeller);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to create role');
+      throw new InternalServerErrorException('Failed to create seller');
     }
   }
 
@@ -34,7 +34,47 @@ import {
       try {
         return await this.sellerService.findAll();
       } catch (error) {
-        throw new InternalServerErrorException('Failed to fetch roles');
+        throw new InternalServerErrorException('Failed to fetch seller');
+      }
+    }
+
+    @Put(':id')
+    async update(
+      @Param('id') id: string,
+      @Body() updateSellerDto: SellerDto,
+    ): Promise<Seller> {
+      try {
+        const seller = await this.sellerService.update(+id, updateSellerDto);
+        if (!seller) {
+          throw new NotFoundException('Seller not found');
+        }
+        return seller;
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          throw error;
+        }
+        throw new InternalServerErrorException('Failed to update seller');
+      }
+    }
+
+    @Delete(':id')
+    async remove(@Param('id') id: string): Promise<void> {
+      try {
+        const deleted: any = await this.sellerService.remove(+id);
+        console.log("-----------------> " + deleted);
+        if (!deleted) {
+          throw new NotFoundException('Seller not found');
+        }
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          throw error;
+        }
+        throw new InternalServerErrorException('Failed to delete seller');
       }
     }
   }
+  
+  
+
+
+ 

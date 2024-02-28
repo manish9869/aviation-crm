@@ -43,13 +43,9 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .post("https://a3fa-184-144-63-44.ngrok-free.app/api/aviation-service-dev/auth/login", {
+      .post("/auth/login", {
         email,
         password,
-        headers: {
-          'Origin': 'http://localhost:3000',
-          'Content-Type': 'application/json',
-        },
       })
       .then((result) => {
         console.log(result);

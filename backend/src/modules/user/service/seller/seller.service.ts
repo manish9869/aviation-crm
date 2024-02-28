@@ -15,7 +15,7 @@ export class SellerService {
     try {
       console.log('++++++++++++++++++++++');
 
-      seller.dateTimeInsert = new Date(seller.dateTimeInsert);
+      seller.date_time_insert = new Date();
 
       const createdSeller = this.sellerRepository.create(seller);
       console.log('------------>' + JSON.stringify(createdSeller));
@@ -37,4 +37,29 @@ export class SellerService {
       throw new InternalServerErrorException('Failed to fetch sellers');
     }
   }
+
+  async update(id: number, updateSellerDto: SellerDto): Promise<Seller> {
+    const seller = await this.sellerRepository.preload({
+      seller_id: id,
+      ...updateSellerDto,
+    })
+    return await this.sellerRepository.save(seller);
+  }
+
+  async remove(id: number): Promise<number> {
+    try {
+      const deleteResult = await this.sellerRepository.delete(id);
+    console.log('deleteResult.affected', deleteResult.affected);
+    if (deleteResult.affected !== 0) {
+      return id; // Return the deleted role ID
+    }
+    } catch (error) {
+      console.error('Error deleting seller:', error);
+      throw error;
+    }
+  }
+
 }
+
+
+

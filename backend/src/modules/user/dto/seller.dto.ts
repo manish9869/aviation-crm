@@ -10,43 +10,46 @@ import {
 } from 'class-validator';
 
 export class SellerDto {
+  @ApiProperty({ required: false }) // Use ApiProperty to customize Swagger documentation
   @IsNumber()
   @IsOptional()
-  sellerId: number;
+  seller_id: number;
 
-  @IsNotEmpty()
-  @IsString()
-  sellerCommericalName: string;
+  @ApiProperty()
+  seller_commerical_name: string;
 
-  @IsNotEmpty()
-  sellerLegalName: string;
+  @ApiProperty()
+  seller_legal_name: string;
 
-  @IsNotEmpty()
+  @ApiProperty()
   address: string;
 
-  @IsNotEmpty()
-  taxIdentificationNumber: string;
+  @ApiProperty()
+  tax_identification_number: string;
 
-  @IsNotEmpty()
-  @IsEmail()
-  contactEmail: string;
+  @ApiProperty()
+  contact_email: string;
 
-  @IsNotEmpty()
-  contactName: string;
+  @ApiProperty()
+  contact_name: string;
 
-  @IsNotEmpty()
-  contactPhoneNumber: string;
+  @ApiProperty()
+  contact_phone_number: string;
 
+  @ApiProperty({ required: false }) // Mark as optional for Swagger
   @IsOptional()
-  aocFile: string;
+  aoc_file: string;
 
+  @ApiProperty({ required: false }) // Mark as optional for Swagger
   @IsOptional()
-  legalNotaryFile: string;
+  legal_notary_file: string;
 
-  @IsNotEmpty()
+  @ApiProperty()
   @IsNumber()
+  @IsOptional()
   enable: number;
 
+  @ApiProperty({ required: false }) // Mark as optional for Swagger
   @IsOptional()
-  dateTimeInsert: Date;
+  date_time_insert: Date;
 }
