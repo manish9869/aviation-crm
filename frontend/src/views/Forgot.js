@@ -35,24 +35,19 @@ import {
 import axios from "axios";
 import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Forgot = () => {
   const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios
-      .post("/auth/login", {
-        email,
-        password,
-      })
-      .then((result) => {
-        console.log(result);
-        navigate("/admin/index");
-      })
-      .catch((err) => console.log(err));
+    // axios.post("", { email, password })
+    // .then((result) => {console.log(result);
+    navigate("/auth/login");
+    // })
+    // .catch(err => console.log(err));
   };
+
 
   return (
     <>
@@ -101,7 +96,7 @@ const Login = () => {
           </CardHeader> */}
           <CardBody className="px-lg-5 py-lg-5">
             <div className="text-center text-muted mb-4">
-              <h1>Login</h1>
+              <h1>Forgot Password</h1>
             </div>
             <Form role="form">
               <FormGroup className="mb-3">
@@ -119,7 +114,7 @@ const Login = () => {
                   />
                 </InputGroup>
               </FormGroup>
-              <FormGroup>
+              {/* <FormGroup>
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
                     <InputGroupText>
@@ -133,8 +128,8 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </InputGroup>
-              </FormGroup>
-              <div className="custom-control custom-control-alternative custom-checkbox">
+              </FormGroup> */}
+              {/* <div className="custom-control custom-control-alternative custom-checkbox">
                 <input
                   className="custom-control-input"
                   id=" customCheckLogin"
@@ -146,14 +141,9 @@ const Login = () => {
                 >
                   <span className="text-muted">Remember me</span>
                 </label>
-              </div>
+              </div> */}
               <div className="text-center">
-                <Button
-                  className="my-4"
-                  color="primary"
-                  type="button"
-                  onClick={handleSubmit}
-                >
+                <Button className="my-4" color="primary" type="button" onClick={handleSubmit}>
                   Sign in
                 </Button>
               </div>
@@ -165,10 +155,7 @@ const Login = () => {
             <a
               className="text-light"
               href="#pablo"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate("/auth/forgot");
-              }}
+              onClick={(e) => e.preventDefault()}
             >
               <small>Forgot password?</small>
             </a>
@@ -188,4 +175,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Forgot;

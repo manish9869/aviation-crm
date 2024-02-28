@@ -4,6 +4,10 @@ import Login from "views/Login.js";
 import Icons from "views/Icons";
 import Maps from "views/Maps";
 import User from "views/User";
+import Seller from "views/Seller";
+import Forgot from "views/Forgot";
+
+
 
 var routes = [
   {
@@ -19,6 +23,14 @@ var routes = [
     name: "User",
     icon: "ni ni-shop text-primary",
     component: <User />,
+    layout: "/admin",
+    sub_menu: [],
+  },
+  {
+    path: "/seller",
+    name: "Seller",
+    icon: "ni ni-shop text-primary",
+    component: <Seller />,
     layout: "/admin",
     sub_menu: [],
   },
@@ -40,6 +52,13 @@ var routes = [
         name: "Login",
         icon: "ni ni-key-25 text-info",
         component: <Login />,
+        layout: "/auth",
+      },
+      {
+        path: "/forgot",
+        name: "Forgot",
+        icon: "ni ni-key-25 text-info",
+        component: <Forgot />,
         layout: "/auth",
       },
     ],
