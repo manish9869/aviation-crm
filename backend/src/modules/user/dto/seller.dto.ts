@@ -5,51 +5,69 @@ import {
   IsPhoneNumber,
   IsOptional,
   IsNumber,
-  IsDate,
+  IsDateString,
   IsString,
 } from 'class-validator';
 
 export class SellerDto {
-  @ApiProperty({ required: false }) // Use ApiProperty to customize Swagger documentation
+  @ApiProperty({ required: false })
   @IsNumber()
   @IsOptional()
-  seller_id: number;
+  seller_id?: number;
 
   @ApiProperty()
-  seller_commerical_name: string;
+  @IsString()
+  @IsNotEmpty()
+  seller_commercial_name: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   seller_legal_name: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   address: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   tax_identification_number: string;
 
   @ApiProperty()
+  @IsEmail()
+  @IsNotEmpty()
   contact_email: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
   contact_name: string;
 
   @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  @IsPhoneNumber()
   contact_phone_number: string;
 
-  @ApiProperty({ required: false }) // Mark as optional for Swagger
+  @ApiProperty({ required: false })
+  @IsString()
   @IsOptional()
-  aoc_file: string;
+  aoc_file?: string;
 
-  @ApiProperty({ required: false }) // Mark as optional for Swagger
+  @ApiProperty({ required: false })
+  @IsString()
   @IsOptional()
-  legal_notary_file: string;
+  legal_notary_file?: string;
 
   @ApiProperty()
   @IsNumber()
-  @IsOptional()
+  @IsNotEmpty()
   enable: number;
 
-  @ApiProperty({ required: false }) // Mark as optional for Swagger
+  @ApiProperty({ required: false })
+  @IsDateString()
   @IsOptional()
-  date_time_insert: Date;
+  date_time_insert?: Date;
 }

@@ -1,40 +1,41 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
+// Import necessary modules
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
 export class Seller {
   @PrimaryGeneratedColumn()
   seller_id: number;
 
-  @Column({ length: 45, nullable: false, unique: true })
-  seller_commerical_name: string;
+  @Column({ length: 45, nullable: false })
+  seller_commercial_name: string;
 
   @Column({ length: 45, nullable: false })
   seller_legal_name: string;
 
-  @Column({ length: 150, nullable: false })
+  @Column()
   address: string;
 
-  @Column({ length: 15, nullable: false })
+  @Column()
   tax_identification_number: string;
 
-  @Column({ length: 45, nullable: false })
+  @Column()
   contact_email: string;
 
-  @Column({ length: 45, nullable: false })
+  @Column()
   contact_name: string;
 
-  @Column({ length: 45, nullable: false })
+  @Column()
   contact_phone_number: string;
 
-  @Column({ length: 150 })
+  @Column()
   aoc_file: string;
 
-  @Column({ length: 150 })
+  @Column()
   legal_notary_file: string;
 
-  @Column({nullable: false })
+  @Column()
   enable: number;
 
-  @Column({nullable: false })
+  @Column({ nullable: true, default: () => 'CURRENT_TIMESTAMP' })
   date_time_insert: Date;
 }
