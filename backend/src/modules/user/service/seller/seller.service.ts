@@ -38,6 +38,10 @@ export class SellerService {
     }
   }
 
+  async findOne(id: number): Promise<Seller> {
+    return await this.sellerRepository.findOne({ where: { seller_id: id } });
+  }
+
   async update(id: number, updateSellerDto: SellerDto): Promise<Seller> {
     const seller = await this.sellerRepository.preload({
       seller_id: id,

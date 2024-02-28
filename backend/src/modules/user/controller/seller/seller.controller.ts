@@ -38,6 +38,22 @@ import {
       }
     }
 
+    @Get(':id')
+    async findOne(@Param('id') id: string): Promise<Seller> {
+      try {
+        const seller = await this.sellerService.findOne(+id);
+        if (!seller) {
+          throw new NotFoundException('Seller not found');
+        }
+        return seller;
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          throw error;
+        }
+        throw new InternalServerErrorException('Failed to fetch seller');
+      }
+    }
+
     @Put(':id')
     async update(
       @Param('id') id: string,
