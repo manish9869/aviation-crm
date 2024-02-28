@@ -10,11 +10,6 @@ import {
 } from 'class-validator';
 
 export class SellerDto {
-  @ApiProperty({ required: false })
-  @IsNumber()
-  @IsOptional()
-  seller_id?: number;
-
   @ApiProperty()
   @IsString()
   @IsNotEmpty()

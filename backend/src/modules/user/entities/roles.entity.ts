@@ -1,7 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
 
-@Entity()
-@Unique(['role_name'])
+@Entity({ name: 'role' })
 export class Roles {
   @PrimaryGeneratedColumn()
   role_id: number;

@@ -8,10 +8,10 @@ import {
 import { Roles } from './roles.entity';
 import { UserType } from './user-type.entity';
 
-@Entity()
+@Entity({ name: 'login_user' })
 export class User {
   @PrimaryGeneratedColumn()
-  user_id: number;
+  login_user_id: number;
 
   @ManyToOne(() => Roles, { eager: true })
   @JoinColumn({ name: 'role_id' })
