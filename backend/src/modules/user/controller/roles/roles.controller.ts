@@ -73,13 +73,16 @@ export class RolesController {
     }
   }
 
+ 
   @Delete(':id')
-  async remove(@Param('id') id: string): Promise<void> {
+  async remove(@Param('id') id: string): Promise<string> {
     try {
       const deleted: any = await this.rolesService.remove(+id);
+      console.log('deleted', deleted);
       if (!deleted) {
         throw new NotFoundException('Role not found');
       }
+      return 'Deleted Successfully';
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw error;
