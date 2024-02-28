@@ -4,6 +4,7 @@ import Login from "views/Login.js";
 import Icons from "views/Icons";
 import Maps from "views/Maps";
 import User from "views/User";
+import Role from "views/Role";
 
 var routes = [
   {
@@ -22,6 +23,15 @@ var routes = [
     layout: "/admin",
     sub_menu: [],
   },
+    {
+  path: "/role",
+  name: "Role",
+  icon: "ni ni-shop text-primary",
+  component: <Role />,
+  layout: "/admin",
+  sub_menu: [],
+},
+
   {
     name: "Customer",
     link: null,
