@@ -18,6 +18,7 @@ import {
 
 import { AgGridReact } from "ag-grid-react";
 
+
 const User = () => {
   const data = [
     { make: "BMW", model: "M3", price: 70000 },
@@ -47,7 +48,33 @@ const User = () => {
     { headerName: "Make", field: "make", sortable: true, filter: true },
     { headerName: "Model", field: "model", sortable: true, filter: true },
     { headerName: "Price (USD)", field: "price", sortable: true, filter: true },
+    {
+      headerName: "Actions",
+      field: "actions",
+      cellRendererFramework: (params) => (
+        <>
+          <Button color="primary" size="sm" onClick={() => handleEdit(params)}>
+            Edit
+          </Button>{" "}
+          <Button color="danger" size="sm" onClick={() => handleDelete(params)}>
+            Delete
+          </Button>
+        </>
+      ),
+    },
   ];
+
+
+  const handleEdit = (params) => {
+    // Add logic for handling edit action
+    console.log("Edit row:", params.data);
+  };
+
+  const handleDelete = (params) => {
+    // Add logic for handling delete action
+    console.log("Delete row:", params.data);
+  };
+
 
   const gridOptions = {
     // PROPERTIES

@@ -13,14 +13,22 @@ export class AuthService {
     username: string,
     pass: string,
   ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findOne(1);
+    const user = await this.usersService.findByEmail(username);
+
+    // console.log('=========> ' + user.email);
+    if (!user || !user.email) {
+      throw new Error('Email not available');
+    }
 
     console.log(pass, username);
-    if ('test' !== pass) {
-      throw new UnauthorizedException();
-    }
-    const payload = { test: 'test' };
+
+    console.log("-------Password------" +pass +" , " + user.password);
+    if (user.password !== pass) {
+      throw new Error('Password not correct');
+        }
+    const payload = { ...user };
     return {
+      ...user,
       access_token: await this.jwtService.signAsync(payload),
     };
   }
