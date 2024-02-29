@@ -14,7 +14,9 @@ import {
   Label,
   InputGroup,
   ModalFooter,
+  CustomInput
 } from "reactstrap";
+import Select from "react-select";
 import Grid from "./../components/ag-grid/Grid";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
@@ -31,6 +33,8 @@ const User = () => {
   const [fetchrole, setFetchRoles] = useState([]);
   const [fetchusertypes, setFetchUserTypes] = useState([]);
   const [fetchsellers, setFetchSellers] = useState([]);
+  const [isClearable, setIsClearable] = useState(true);
+  const [isSearchable, setIsSearchable] = useState(true);
 
   const [formErrors, setFormErrors] = useState({
     firstname: "",
@@ -147,6 +151,8 @@ const User = () => {
       seller,
       enable,
     } = formData;
+
+    // console.log(profile_pic, role, user_type, seller);
 
     if (!firstname.trim()) {
       errors.firstname = "First Name is required";
@@ -270,6 +276,8 @@ const User = () => {
           user_type,
           seller,
         }));
+
+        resetForm();
         // console.log("Form Data " + JSON.stringify(formData));
       } catch (error) {
         setError(true);
@@ -329,6 +337,7 @@ const User = () => {
       enable: parseInt(formData.enable, 10),
     };
 
+    console.log("Form Data after submitting " + formDataWithNumber);
     const url = isEdit ? `/user/${editeduserId}` : "/user";
     console.log("formData====>", formData);
     axios
@@ -405,6 +414,7 @@ const User = () => {
     date_time_insert: "Inserted Date",
     enable: "Enable",
     role: "Role",
+    // role.role_name: "Role Name",
     user_type: "User Type",
     seller: "Seller",
   };
@@ -425,7 +435,7 @@ const User = () => {
                 <h3 className="mb-0">{isEdit ? "Edit User" : "Add User"}</h3>
               </CardHeader>
               <CardBody>
-                <Form role="form" onSubmit={handleSubmit}>
+                <Form role="form">
                   <FormGroup>
                     <Label for="firstname">User First Name</Label>
                     <InputGroup className="input-group-alternative mb-3">
@@ -514,7 +524,7 @@ const User = () => {
                       </small>
                     )}
                   </FormGroup>
-                  <FormGroup>
+                  {/* <FormGroup>
                     <Label for="enable">Enable</Label>
                     <InputGroup className="input-group-alternative">
                       <Input
@@ -529,7 +539,29 @@ const User = () => {
                     {formErrors.enable && (
                       <small className="text-danger">{formErrors.enable}</small>
                     )}
+                  </FormGroup> */}
+                  <FormGroup>
+                    <Label for="enable">Enable</Label>
+                    <CustomInput
+                      type="switch"
+                      id="enable"
+                      name="enable"
+                      onChange={(e) =>
+                        handleChange({
+                          target: {
+                            name: "enable",
+                            value: e.target.checked ? 1 : 0,
+                          },
+                        })
+                      }
+                      checked={formData.enable === 1}
+                      label={formData.enable === 1 ? "Enabled" : "Disabled"}
+                    />
+                    {formErrors.enable && (
+                      <small className="text-danger">{formErrors.enable}</small>
+                    )}
                   </FormGroup>
+
                   <FormGroup>
                     <Label for="role">Role</Label>
                     <InputGroup className="input-group-alternative mb-3">
@@ -541,7 +573,9 @@ const User = () => {
                           onChange={handleChange}
                           value={formData.role || ""}
                         >
-                          <option value="">Select Role</option>
+                          <option key="" value="">
+                            Select Role
+                          </option>
                           {fetchrole.map((role) => (
                             <option key={role.role_id} value={role.role_id}>
                               {role.role_name}
@@ -565,7 +599,7 @@ const User = () => {
                           name="user_type"
                           id="user_type"
                           onChange={handleChange}
-                          value={formData.user_type || ""}
+                          // value={formData.user_type || ""}
                         >
                           <option value="">Select User Type</option>
                           {fetchusertypes.map((userType) => (
@@ -591,29 +625,29 @@ const User = () => {
                   {/* Seller dropdown */}
                   <FormGroup>
                     <Label for="seller">Seller</Label>
-                    <InputGroup className="input-group-alternative mb-3">
-                      {fetchsellers && fetchsellers.length > 0 ? (
-                        <Input
-                          type="select"
-                          name="seller"
-                          id="seller"
-                          onChange={handleChange}
-                          value={formData.seller || ""}
-                        >
-                          <option value="">Select Seller</option>
-                          {fetchsellers.map((seller) => (
-                            <option
-                              key={seller.seller_id}
-                              value={seller.seller_id}
-                            >
-                              {seller.seller_commercial_name}
-                            </option>
-                          ))}
-                        </Input>
-                      ) : (
-                        <div>No sellers available</div>
-                      )}
-                    </InputGroup>
+                    {fetchsellers && fetchsellers.length > 0 ? (
+                      <Select
+                        options={fetchsellers.map((seller) => ({
+                          value: seller.seller_id.toString(),
+                          label: seller.seller_commercial_name,
+                        }))}
+                        value={fetchsellers.find(
+                          (seller) => seller.seller_id === formData.seller
+                        )}
+                        onChange={(selectedOption) => {
+                          setFormData((prevFormData) => ({
+                            ...prevFormData,
+                            seller: selectedOption
+                              ? selectedOption.value
+                              : null,
+                          }));
+                        }}
+                        isClearable={true}
+                        isSearchable={true}
+                      />
+                    ) : (
+                      <div>No sellers available</div>
+                    )}
                     {formErrors.seller && (
                       <small className="text-danger">{formErrors.seller}</small>
                     )}
@@ -628,6 +662,11 @@ const User = () => {
                         resetForm();
                         setIsEdit(false); // Reset edit mode
                         setEditeduserId(null); // Reset edited user ID
+                        // Clear the seller value in formData
+                        setFormData((prevFormData) => ({
+                          ...prevFormData,
+                          seller: null,
+                        }));
                       }}
                     >
                       Clear

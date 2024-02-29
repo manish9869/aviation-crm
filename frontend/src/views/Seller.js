@@ -14,6 +14,7 @@ import {
   Label,
   InputGroup,
   ModalFooter,
+  CustomInput
 } from "reactstrap";
 import Grid from "./../components/ag-grid/Grid";
 import axios from "axios";
@@ -550,16 +551,21 @@ const Seller = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label for="enable">Enable</Label>
-                    <InputGroup className="input-group-alternative">
-                      <Input
-                        id="enable"
-                        name="enable"
-                        placeholder="enable"
-                        type="number"
-                        value={formData.enable}
-                        onChange={handleChange}
-                      />
-                    </InputGroup>
+                    <CustomInput
+                      type="switch"
+                      id="enable"
+                      name="enable"
+                      onChange={(e) =>
+                        handleChange({
+                          target: {
+                            name: "enable",
+                            value: e.target.checked ? 1 : 0,
+                          },
+                        })
+                      }
+                      checked={formData.enable === 1}
+                      label={formData.enable === 1 ? "Enabled" : "Disabled"}
+                    />
                     {formErrors.enable && (
                       <small className="text-danger">{formErrors.enable}</small>
                     )}
