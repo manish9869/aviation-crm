@@ -598,6 +598,7 @@ const Seller = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
+                idKey="seller_id"
               />
             </div>
           </div>

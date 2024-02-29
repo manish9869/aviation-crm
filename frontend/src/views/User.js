@@ -59,6 +59,7 @@ const User = () => {
   /*#region AG GRID Handlers and Column Defination */
 
   const handleEdit = (userId) => {
+    console.log("userId", userId);
     // Fetch user details by ID and set form fields
     fetchUserDetails(userId);
     setIsEdit(true); // Set edit mode
@@ -67,7 +68,7 @@ const User = () => {
 
   const handleDelete = async (userId) => {
     try {
-      console.log('Id: ' + userId);
+      console.log("Id: " + userId);
       const response = await axios.delete(`/user/${userId}`);
 
       if (response.status === 200) {
@@ -286,6 +287,8 @@ const User = () => {
       if (response.status === 200) {
         const userDetails = response.data.data;
 
+        console.log(userDetails);
+
         // Set form fields with user details
         setFormData({
           firstname: userDetails.firstname,
@@ -337,7 +340,6 @@ const User = () => {
       .then(async (result) => {
         console.log("Add API-------> " + result);
         if (result) {
-          
           toast.success(isEdit ? "Updated Successfully" : "Added Successfully");
           const getResponse = await axios.get("/user");
           setRowData(getResponse.data.data);
@@ -537,7 +539,7 @@ const User = () => {
                           name="role"
                           id="role"
                           onChange={handleChange}
-                          // value={formData.role.role_name || ""}
+                          value={formData.role || ""}
                         >
                           <option value="">Select Role</option>
                           {fetchrole.map((role) => (
@@ -563,7 +565,7 @@ const User = () => {
                           name="user_type"
                           id="user_type"
                           onChange={handleChange}
-                          // value={fetchusertypes || ""}
+                          value={formData.user_type || ""}
                         >
                           <option value="">Select User Type</option>
                           {fetchusertypes.map((userType) => (
@@ -596,7 +598,7 @@ const User = () => {
                           name="seller"
                           id="seller"
                           onChange={handleChange}
-                          // value={fetchsellers.seller_commercial_name || ""}
+                          value={formData.seller || ""}
                         >
                           <option value="">Select Seller</option>
                           {fetchsellers.map((seller) => (
@@ -652,6 +654,7 @@ const User = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
+                idKey="login_user_id" // or "user_id" depending on your use case
               />
             </div>
           </div>
