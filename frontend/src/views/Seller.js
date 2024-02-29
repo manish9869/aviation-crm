@@ -90,6 +90,8 @@ const Seller = () => {
       const response = await axios.get(`/sellers/${sellerId}`);
       if (response.status === 200) {
         const sellerDetails = response.data.data;
+
+        console.log("Seller Details: " + JSON.stringify(sellerDetails));
         setSelectedSellerDetails(sellerDetails);
         setIsViewModalOpen(true);
       } else {
