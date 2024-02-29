@@ -22,7 +22,7 @@ export class UserService {
 
   async findOne(id: number): Promise<User> {
     return await this.userRepository.findOne({
-      where: { user_id: id },
+      where: { login_user_id: id },
     });
   }
 
@@ -34,7 +34,7 @@ export class UserService {
 
   async update(id: number, userDto: UserDto): Promise<User> {
     const user = await this.userRepository.preload({
-      user_id: id,
+      login_user_id: id,
       ...userDto,
     });
     return await this.userRepository.save(user);

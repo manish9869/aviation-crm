@@ -22,13 +22,13 @@ export class UserTypeService {
 
   async findOne(id: number): Promise<UserType> {
     return await this.userTypeRepository.findOne({
-      where: { user_type_id: id },
+      where: { login_user_type_id: id },
     });
   }
 
   async update(id: number, userTypeDto: UserTypeDto): Promise<UserType> {
     const userType = await this.userTypeRepository.preload({
-      user_type_id: id,
+      login_user_type_id: id,
       ...userTypeDto,
     });
     return await this.userTypeRepository.save(userType);
