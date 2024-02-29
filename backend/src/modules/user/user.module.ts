@@ -22,8 +22,19 @@ import { Seller } from './entities/seller.entity';
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Seller]),
   ],
-  controllers: [RolesController, UserController, UserTypeController, SellerController],
-  providers: [Logger, RolesService, UserService, UserTypeService, SellerService],
-  exports: [RolesService, UserService, UserTypeService, SellerService], 
+  controllers: [
+    RolesController,
+    UserController,
+    UserTypeController,
+    SellerController,
+  ],
+  providers: [
+    Logger,
+    RolesService,
+    UserService,
+    UserTypeService,
+    SellerService,
+  ],
+  exports: [RolesService, UserService, UserTypeService, SellerService],
 })
 export class UserModule {}

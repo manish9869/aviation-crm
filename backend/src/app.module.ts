@@ -8,9 +8,13 @@ import { ConfigModule } from '@nestjs/config';
 import { HttpServiceModule } from './http-service/http-service.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
+    UploadsModule,
     AuthModule,
     UserModule,
     HttpServiceModule,
@@ -19,6 +23,10 @@ import { AuthModule } from './modules/auth/auth.module';
       load: [databaseConfig],
     }),
     TypeOrmModule.forRoot(AppDataSource.options),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public', 'media-files'), // Path to the directory where images are saved
+      serveRoot: '/media-file', // URL path where images will be served
+    }),
   ],
   controllers: [AppController],
   providers: [AppService, Logger],
