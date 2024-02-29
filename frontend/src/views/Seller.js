@@ -20,6 +20,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
+import axiosInstance from "./../helper/axios";
 
 const Seller = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -225,7 +226,7 @@ const Seller = () => {
     (async () => {
       try {
         setError(false);
-        const response = await axios.get("/sellers");
+        const response = await axiosInstance.get("/sellers");
         setRowData(response.data.data);
       } catch (error) {
         setError(true);
