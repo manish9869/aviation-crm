@@ -20,8 +20,11 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
+import Dropzone from "components/Dropzone/Dropzone";
 
 const Seller = () => {
+  const [resetDropzone, setResetDropzone] = useState(false);
+  const [files, setFiles] = useState([]);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedSellerDetails, setSelectedSellerDetails] = useState(null);
   const [error, setError] = useState(false);
@@ -53,6 +56,30 @@ const Seller = () => {
     legal_notary_file: "",
     enable: 0,
   });
+
+  const [response, setResponse] = useState([]);
+
+  const handleSubmit1 = async () => {
+    if (!files?.length) return;
+
+    const formData = new FormData();
+    files.forEach((file) => formData.append("file", file));
+    formData.append("upload_preset", "friendsbook");
+
+    try {
+      const response = await axios.post("/media/upload", formData);
+      // Reset Dropzone after submitting
+      setFiles([]);
+      setResetDropzone(true);
+      setResponse(response.data);
+    } catch (error) {
+      // Handle errors
+      console.error("Error:", error);
+    }
+  };
+  const handleFilesUploaded = (uploadedFiles) => {
+    setFiles(uploadedFiles);
+  };
 
   /*#region AG GRID Handlers and Column Defination */
 
@@ -325,7 +352,7 @@ const Seller = () => {
                 </h3>
               </CardHeader>
               <CardBody>
-                <Form role="form" onSubmit={handleSubmit}>
+                <Form role="form">
                   <FormGroup>
                     <Label for="seller_commercial_name">
                       Seller Commercial Name
@@ -428,13 +455,18 @@ const Seller = () => {
                   <FormGroup>
                     <Label for="aoc_file">AOC File</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      <Input
+                      {/* <Input
                         id="aoc_file"
                         name="aoc_file"
                         value={formData.aoc_file}
                         placeholder="AOC File"
                         type="text"
                         onChange={handleChange}
+                      /> */}
+
+                      <Dropzone
+                        onFilesUploaded={handleFilesUploaded}
+                        resetFiles={resetDropzone}
                       />
                     </InputGroup>
                   </FormGroup>
@@ -481,7 +513,7 @@ const Seller = () => {
                       className="mt-4"
                       color={isEdit ? "info" : "primary"}
                       type="button"
-                      onClick={handleSubmit}
+                      onClick={handleSubmit1}
                     >
                       {isEdit ? "Update" : "Submit"}
                     </Button>

@@ -27,11 +27,11 @@ export class Seller {
   @Column()
   contact_phone_number: string;
 
-  @Column()
-  aoc_file: string;
+  @Column({ type: 'json', nullable: true })
+  aoc_file: object[];
 
-  @Column()
-  legal_notary_file: string;
+  @Column({ type: 'json', nullable: true })
+  legal_notary_file: object[];
 
   @Column()
   enable: number;
