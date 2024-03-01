@@ -9,6 +9,7 @@ import { HttpServiceModule } from './http-service/http-service.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
 
+
 @Module({
   imports: [
     AuthModule,
