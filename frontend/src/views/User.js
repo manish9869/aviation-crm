@@ -14,7 +14,7 @@ import {
   Label,
   InputGroup,
   ModalFooter,
-  CustomInput
+  CustomInput,
 } from "reactstrap";
 import Select from "react-select";
 import Grid from "./../components/ag-grid/Grid";
@@ -65,6 +65,7 @@ const User = () => {
   const handleEdit = (userId) => {
     console.log("userId", userId);
     // Fetch user details by ID and set form fields
+    fetchSellers();
     fetchUserDetails(userId);
     setIsEdit(true); // Set edit mode
     setEditeduserId(userId); // Set the ID of the user being edited
