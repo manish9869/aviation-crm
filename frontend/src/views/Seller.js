@@ -23,6 +23,7 @@ import ViewModal from "components/Modal/Modal";
 import Dropzone from "components/Dropzone/Dropzone";
 
 const Seller = () => {
+  const [mediaUpoladRes, setmediaUpoladRes] = useState([]);
   const [resetDropzone, setResetDropzone] = useState(false);
   const [files, setFiles] = useState([]);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -57,26 +58,6 @@ const Seller = () => {
     enable: 0,
   });
 
-  const [response, setResponse] = useState([]);
-
-  const handleSubmit1 = async () => {
-    if (!files?.length) return;
-
-    const formData = new FormData();
-    files.forEach((file) => formData.append("file", file));
-    formData.append("upload_preset", "friendsbook");
-
-    try {
-      const response = await axios.post("/media/upload", formData);
-      // Reset Dropzone after submitting
-      setFiles([]);
-      setResetDropzone(true);
-      setResponse(response.data);
-    } catch (error) {
-      // Handle errors
-      console.error("Error:", error);
-    }
-  };
   const handleFilesUploaded = (uploadedFiles) => {
     setFiles(uploadedFiles);
   };
@@ -209,14 +190,7 @@ const Seller = () => {
 
   useEffect(() => {
     (async () => {
-      try {
-        setError(false);
-        const response = await axios.get("/sellers");
-        setRowData(response.data.data);
-      } catch (error) {
-        setError(true);
-        toast.error("Failed to fetch seller data");
-      }
+      await fetchAllSeller();
     })();
   }, []);
 
@@ -249,25 +223,70 @@ const Seller = () => {
     }
   };
 
+  const fetchAllSeller = async () => {
+    try {
+      setError(false);
+      const response = await axios.get("/sellers");
+      setRowData(response.data.data);
+    } catch (error) {
+      setError(true);
+      toast.error("Failed to fetch seller data");
+    }
+  };
+  const uploadMedia = async () => {
+    if (!files?.length) return;
+
+    setResetDropzone(false);
+
+    console.log("files======>", files);
+
+    const formData = new FormData();
+    files.forEach((file) => formData.append("file", file));
+    formData.append("upload_preset", "friendsbook");
+
+    try {
+      const response = await axios.post("/media/upload", formData);
+      console.log("response media upload====>", response.data.data);
+
+      // Update mediaUpoladRes state after successful API call
+      setmediaUpoladRes(response.data.data);
+
+      // Reset Dropzone after submitting
+      setFiles([]);
+      setResetDropzone(true);
+
+      // Log the updated state value
+      console.log("mediaUpoladRes after setting state:", mediaUpoladRes);
+    } catch (error) {
+      // Handle errors
+      console.error("Error:", error);
+    }
+  };
+
   /*#endregion API CALLS */
 
   /*#region BUTTON CLICKS */
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
 
+    await uploadMedia();
+
+    console.log("mediaUpoladRes after uploadMedia call:", mediaUpoladRes);
+
     // Convert 'enable' field to a number
     const formDataWithNumber = {
       ...formData,
       enable: parseInt(formData.enable, 10),
+      aoc_file: mediaUpoladRes,
     };
 
     const url = isEdit ? `/sellers/${editedSellerId}` : "/sellers";
-    console.log("formData====>", formData);
+    console.log("formDataWithNumber====>", formDataWithNumber);
     axios
       .request({
         url,
@@ -275,7 +294,7 @@ const Seller = () => {
         data: formDataWithNumber,
       })
       .then(async (result) => {
-        console.log(result);
+        console.log("result======>", result);
         if (result) {
           toast.success(isEdit ? "Updated Successfully" : "Added Successfully");
           const getResponse = await axios.get("/sellers");
@@ -513,7 +532,7 @@ const Seller = () => {
                       className="mt-4"
                       color={isEdit ? "info" : "primary"}
                       type="button"
-                      onClick={handleSubmit1}
+                      onClick={handleSubmit}
                     >
                       {isEdit ? "Update" : "Submit"}
                     </Button>
