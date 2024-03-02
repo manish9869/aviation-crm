@@ -26,6 +26,7 @@ import ViewModal from "components/Modal/Modal";
 const User = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUserDetails, setSelectedUserDetails] = useState(null);
+  const [selectedSellerDDL, setSelectedSellerDDL] = useState("");
   const [error, setError] = useState(false);
   const [editeduserId, setEditeduserId] = useState(null);
   const [rowData, setRowData] = useState([]);
@@ -33,8 +34,6 @@ const User = () => {
   const [fetchrole, setFetchRoles] = useState([]);
   const [fetchusertypes, setFetchUserTypes] = useState([]);
   const [fetchsellers, setFetchSellers] = useState([]);
-  const [isClearable, setIsClearable] = useState(true);
-  const [isSearchable, setIsSearchable] = useState(true);
 
   const [formErrors, setFormErrors] = useState({
     firstname: "",
@@ -62,11 +61,12 @@ const User = () => {
 
   /*#region AG GRID Handlers and Column Defination */
 
-  const handleEdit = (userId) => {
+  const handleEdit = async (userId) => {
     console.log("userId", userId);
     // Fetch user details by ID and set form fields
-    fetchSellers();
-    fetchUserDetails(userId);
+
+    await fetchSellers();
+    await fetchUserDetails(userId);
     console.log("FormData--->" + formData);
     setIsEdit(true); // Set edit mode
     setEditeduserId(userId); // Set the ID of the user being edited
@@ -248,7 +248,20 @@ const User = () => {
   const fetchSellers = async () => {
     try {
       const response = await axios.get("/sellers");
-      setFetchSellers(response.data.data);
+
+      const sellersOptions = response.data.data.map((seller) => ({
+        value: seller.seller_id,
+        label: seller.seller_commercial_name,
+      }));
+
+      const optionsWithDefault = [
+        { value: "-1", label: "Select Seller" },
+        ...sellersOptions,
+      ];
+
+      // Set the state with the options
+      setFetchSellers(sellersOptions);
+
       return response.data.data;
     } catch (error) {
       console.error("Failed to fetch sellers", error);
@@ -257,39 +270,41 @@ const User = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setError(false);
-
-        // Fetch roles, user types, and sellers
-        const [role, user_type, seller, userData] = await Promise.all([
-          fetchRoles(),
-          fetchUserTypes(),
-          fetchSellers(),
-          axios.get("/user"),
-        ]);
-
-        setRowData(userData.data.data);
-        // console.log("UserData=========> " + JSON.stringify(userData.data.data));
-
-        // Update form data with fetched roles, user types, and sellers
-        setFormData((prevFormData) => ({
-          ...prevFormData,
-          role,
-          user_type,
-          seller,
-        }));
-
-        resetForm();
-        // console.log("Form Data " + JSON.stringify(formData));
-      } catch (error) {
-        setError(true);
-        toast.error("Failed to fetch user data");
-      }
-    };
-
-    fetchData();
+    (async () => {
+      await fetchData();
+    })();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      setError(false);
+
+      // Fetch roles, user types, and sellers
+      const [role, user_type, seller, userData] = await Promise.all([
+        fetchRoles(),
+        fetchUserTypes(),
+        fetchSellers(),
+        axios.get("/user"),
+      ]);
+
+      setRowData(userData.data.data);
+      // console.log("UserData=========> " + JSON.stringify(userData.data.data));
+
+      // Update form data with fetched roles, user types, and sellers
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        role,
+        user_type,
+        seller,
+      }));
+
+      resetForm();
+      // console.log("Form Data " + JSON.stringify(formData));
+    } catch (error) {
+      setError(true);
+      toast.error("Failed to fetch user data");
+    }
+  };
 
   const fetchUserDetails = async (userId) => {
     try {
@@ -299,7 +314,10 @@ const User = () => {
         const userDetails = response.data.data;
 
         console.log(userDetails);
-
+        setSelectedSellerDDL({
+          value: userDetails.seller_id,
+          label: userDetails.seller_commercial_name,
+        });
         // Set form fields with user details
         setFormData({
           firstname: userDetails.firstname,
@@ -370,10 +388,10 @@ const User = () => {
   };
 
   const handleChange = (e) => {
-    // if(!e.target){
-    //   const {name, value} = {"test", "test1"};
-    // }
+    console.log("e.target.value====>", e);
+
     if (e === null || e === undefined) {
+      setSelectedSellerDDL({ value: -1, label: "Select Seller" });
       setFormData((prevFormData) => ({
         ...prevFormData,
         seller: null,
@@ -385,20 +403,18 @@ const User = () => {
     if (e.hasOwnProperty("label")) {
       name = "seller";
       value = e.value;
-      const type = typeof value;
-      console.log(type);
+      setSelectedSellerDDL({ value: value, label: e.label });
     } else {
       name = e.target.name;
       value = e.target.value;
-      const type = typeof value;
-      console.log(type);
     }
     console.log("we are in Handle change for " + name + " : " + value);
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
     }));
-    console.log(formData);
+
+    console.log("selectedSellerDDL===>", selectedSellerDDL);
   };
 
   const resetForm = () => {
@@ -650,7 +666,21 @@ const User = () => {
                   {/* Seller dropdown */}
                   <FormGroup>
                     <Label for="seller">Seller</Label>
-                    {fetchsellers && fetchsellers.length > 0 ? (
+
+                    <Select
+                      className="basic-single"
+                      classNamePrefix="select"
+                      isClearable={true}
+                      isSearchable={true}
+                      name="ddlSeller"
+                      value={fetchsellers.find(
+                        (obj) => obj.value === selectedSellerDDL
+                      )}
+                      onChange={handleChange}
+                      options={fetchsellers}
+                    />
+
+                    {/* {fetchsellers && fetchsellers.length > 0 ? (
                       <Select
                         // value={formData.seller || ""}
                         onChange={handleChange}
@@ -685,7 +715,7 @@ const User = () => {
                     )}
                     {formErrors.seller && (
                       <small className="text-danger">{formErrors.seller}</small>
-                    )}
+                    )} */}
                   </FormGroup>
 
                   <div className="text-center">
