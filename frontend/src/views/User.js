@@ -26,7 +26,7 @@ import ViewModal from "components/Modal/Modal";
 const User = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedUserDetails, setSelectedUserDetails] = useState(null);
-  const [selectedSellerDDL, setSelectedSellerDDL] = useState("");
+  const [selectedSellerDDL, setSelectedSellerDDL] = useState({});
   const [error, setError] = useState(false);
   const [editeduserId, setEditeduserId] = useState(null);
   const [rowData, setRowData] = useState([]);
@@ -275,6 +275,8 @@ const User = () => {
     })();
   }, []);
 
+  useEffect(() => {}, []);
+
   const fetchData = async () => {
     try {
       setError(false);
@@ -315,9 +317,15 @@ const User = () => {
 
         console.log(userDetails);
         setSelectedSellerDDL({
-          value: userDetails.seller_id,
-          label: userDetails.seller_commercial_name,
+          value: userDetails.seller.seller_id,
+          label: userDetails.seller.seller_commercial_name,
         });
+
+        console.log(
+          "setSelectedSellerDDL========================>",
+          selectedSellerDDL
+        );
+
         // Set form fields with user details
         setFormData({
           firstname: userDetails.firstname,
@@ -674,7 +682,7 @@ const User = () => {
                       isSearchable={true}
                       name="ddlSeller"
                       value={fetchsellers.find(
-                        (obj) => obj.value === selectedSellerDDL
+                        (obj) => obj.value === selectedSellerDDL.value
                       )}
                       onChange={handleChange}
                       options={fetchsellers}
