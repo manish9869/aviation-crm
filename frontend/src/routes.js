@@ -7,6 +7,8 @@ import User from "views/User";
 import Seller from "views/Seller";
 import Forgot from "views/Forgot";
 import Fleet from "views/Fleet";
+import Role from "views/Role";
+
 
 
 var routes = [
@@ -31,6 +33,10 @@ var routes = [
     name: "Fleet",
     icon: "ni ni-shop text-primary",
     component: <Fleet />,
+    path: "/role",
+    name: "Role",
+    icon: "ni ni-shop text-primary",
+    component: <Role/>,
     layout: "/admin",
     sub_menu: [],
   },
