@@ -8,12 +8,10 @@ import {
   FormGroup,
   Form,
   Row,
-  Col,
   Button,
   Input,
   Label,
   InputGroup,
-  ModalFooter,
   CustomInput,
 } from "reactstrap";
 import Grid from "./../components/ag-grid/Grid";
@@ -73,6 +71,7 @@ const Seller = () => {
 
   const handleEdit = (sellerId) => {
     // Fetch seller details by ID and set form fields
+    resetForm();
     fetchSellerDetails(sellerId);
     setIsEdit(true); // Set edit mode
     setEditedSellerId(sellerId); // Set the ID of the seller being edited
@@ -208,15 +207,16 @@ const Seller = () => {
       }
     }
 
-    if (!aoc_file.trim()) {
-      errors.aoc_file = "AOC File is required";
-      valid = false;
-    }
-
-    if (!legal_notary_file.trim()) {
-      errors.legal_notary_file = "Legal Notary File is required";
-      valid = false;
-    }
+    // console.log("aoc_file.length", aoc_file.length);
+    // if (!aoc_file.length) {
+    //   errors.aoc_file = "AOC File is required";
+    //   valid = false;
+    // }
+    // console.log("legal_notary_file.length", legal_notary_file.length);
+    // if (!legal_notary_file.length) {
+    //   errors.legal_notary_file = "Legal Notary File is required";
+    //   valid = false;
+    // }
 
     if (enable === null) {
       errors.enable = "Enable is required";
