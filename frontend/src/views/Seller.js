@@ -194,6 +194,16 @@ const Seller = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      if (mediaUpoladRes.length > 0) {
+        console.log("Media uploaded successfully:", mediaUpoladRes);
+
+        await addUpdateSeller();
+      }
+    })();
+  }, [mediaUpoladRes]);
+
   const fetchSellerDetails = async (sellerId) => {
     try {
       const response = await axios.get(`/sellers/${sellerId}`);
@@ -233,6 +243,7 @@ const Seller = () => {
       toast.error("Failed to fetch seller data");
     }
   };
+
   const uploadMedia = async () => {
     if (!files?.length) return;
 
@@ -263,42 +274,36 @@ const Seller = () => {
     }
   };
 
-  /*#endregion API CALLS */
+  const addUpdateSeller = async () => {
+    console.log("mediaUpoladRes===================>", mediaUpoladRes);
 
-  /*#region BUTTON CLICKS */
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
+    let updatedFomData = {};
+    if (mediaUpoladRes.length > 0) {
+      updatedFomData = {
+        ...formData,
+        enable: parseInt(formData.enable, 10),
+        aoc_file: mediaUpoladRes,
+      };
+    } else {
+      updatedFomData = {
+        ...formData,
+        enable: parseInt(formData.enable, 10),
+      };
     }
 
-    await uploadMedia();
-
-    console.log("mediaUpoladRes after uploadMedia call:", mediaUpoladRes);
-
-    // Convert 'enable' field to a number
-    const formDataWithNumber = {
-      ...formData,
-      enable: parseInt(formData.enable, 10),
-      aoc_file: mediaUpoladRes,
-    };
-
     const url = isEdit ? `/sellers/${editedSellerId}` : "/sellers";
-    console.log("formDataWithNumber====>", formDataWithNumber);
-    axios
+    console.log("formDataWithNumber====>", updatedFomData);
+    await axios
       .request({
         url,
         method: isEdit ? "put" : "post",
-        data: formDataWithNumber,
+        data: updatedFomData,
       })
       .then(async (result) => {
         console.log("result======>", result);
         if (result) {
           toast.success(isEdit ? "Updated Successfully" : "Added Successfully");
-          const getResponse = await axios.get("/sellers");
-          setRowData(getResponse.data.data);
+          await fetchAllSeller();
 
           // Scroll to the top of the page
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -315,6 +320,24 @@ const Seller = () => {
       });
   };
 
+  /*#endregion API CALLS */
+
+  /*#region BUTTON CLICKS */
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    if (!files?.length) {
+      await addUpdateSeller();
+    } else {
+      await uploadMedia();
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -329,6 +352,7 @@ const Seller = () => {
     setEditedSellerId(null);
     setIsViewModalOpen(false);
     setSelectedSellerDetails(null);
+    setmediaUpoladRes([]);
     setFormData({
       seller_commercial_name: "",
       seller_legal_name: "",
