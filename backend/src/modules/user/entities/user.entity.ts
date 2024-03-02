@@ -7,19 +7,24 @@ import {
 } from 'typeorm';
 import { Roles } from './roles.entity';
 import { UserType } from './user-type.entity';
+import { Seller } from './seller.entity';
 
-@Entity()
+@Entity({ name: 'login_user' })
 export class User {
   @PrimaryGeneratedColumn()
-  user_id: number;
+  login_user_id: number;
 
   @ManyToOne(() => Roles, { eager: true })
   @JoinColumn({ name: 'role_id' })
-  role: Roles;
+  role: number;
 
   @ManyToOne(() => UserType, { eager: true })
-  @JoinColumn({ name: 'user_type_id' })
-  user_type: UserType;
+  @JoinColumn({ name: 'login_user_type_id' })
+  user_type: number;
+
+  @ManyToOne(() => Seller, { eager: true })
+  @JoinColumn({ name: 'seller_id' })
+  seller: number;
 
   @Column({ length: 45, nullable: false })
   firstname: string;

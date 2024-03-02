@@ -1,0 +1,54 @@
+.navbar-nav > .nav-item > .nav-link.active {
+  background: #f6f9fc;
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 0.375rem;
+}
+
+.navbar-vertical .navbar-nav .nav-link > i {
+  min-width: 0;
+  font-size: 0.8rem;
+}
+
+.txtMargin {
+  margin-left: 10px;
+  font-size: 0.8rem !important;
+}
+
+.nav-link-style {
+  padding: 0.4rem 3rem !important;
+  font-size: 0.8rem !important;
+}
+
+.fa-chevron-right {
+  font-size: 0.7rem !important;
+}
+
+.fa-chevron-down {
+  font-size: 0.7rem !important;
+}
+
+/* For WebKit (Chrome, Safari, newer versions of Opera) */
+/* Customize the scrollbar width and color */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Customize the scrollbar track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Customize the scrollbar handle */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(155, 155, 155, 0.5);
+  border-radius: 20px;
+  border: transparent;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(155, 155, 155, 0.7);
+}

@@ -1,10 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity()
-@Unique(['user_type'])
+@Entity({ name: 'login_user_type' })
 export class UserType {
   @PrimaryGeneratedColumn()
-  user_type_id: number;
+  login_user_type_id: number;
 
   @Column({ length: 45, nullable: false })
   user_type: string;

@@ -3,14 +3,16 @@ import {
   NestInterceptor,
   ExecutionContext,
   CallHandler,
+  HttpStatus,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 export interface Response<T> {
-  statusCode: number;
-  message: string;
+  status: string;
   data: T;
+  errors: any;
+  message: string;
 }
 
 @Injectable()
@@ -23,9 +25,10 @@ export class ResponseHandlerInterceptor<T>
   ): Observable<Response<T>> {
     return next.handle().pipe(
       map((data) => ({
-        statusCode: context.switchToHttp().getResponse().statusCode,
-        message: 'Data Received',
+        status: 'success',
         data,
+        errors: context.switchToHttp().getResponse().locals.errors || {},
+        message: context.switchToHttp().getResponse().locals.message || '',
       })),
     );
   }
