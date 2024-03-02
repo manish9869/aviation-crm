@@ -13,7 +13,6 @@ import {
   Input,
   Label,
   InputGroup,
-  ModalFooter,
 } from "reactstrap";
 import Grid from "./../components/ag-grid/Grid";
 import axios from "axios";
@@ -23,8 +22,10 @@ import ViewModal from "components/Modal/Modal";
 import Dropzone from "components/Dropzone/Dropzone";
 
 const Seller = () => {
-  const [resetDropzone, setResetDropzone] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [resetLegalDropzone, setResetLegalDropzone] = useState(false);
+  const [resetAocDropzone, setResetAocDropzone] = useState(false);
+  const [legalFiles, setLegalFiles] = useState([]);
+  const [aocFiles, setAocFiles] = useState([]);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedSellerDetails, setSelectedSellerDetails] = useState(null);
   const [error, setError] = useState(false);
@@ -52,33 +53,17 @@ const Seller = () => {
     contact_email: "",
     contact_name: "",
     contact_phone_number: "",
-    aoc_file: "",
-    legal_notary_file: "",
+    aoc_file: [],
+    legal_notary_file: [],
     enable: 0,
   });
 
-  const [response, setResponse] = useState([]);
-
-  const handleSubmit1 = async () => {
-    if (!files?.length) return;
-
-    const formData = new FormData();
-    files.forEach((file) => formData.append("file", file));
-    formData.append("upload_preset", "friendsbook");
-
-    try {
-      const response = await axios.post("/media/upload", formData);
-      // Reset Dropzone after submitting
-      setFiles([]);
-      setResetDropzone(true);
-      setResponse(response.data);
-    } catch (error) {
-      // Handle errors
-      console.error("Error:", error);
-    }
+  const handleAocFilesUploaded = (uploadedFiles) => {
+    setAocFiles(uploadedFiles);
   };
-  const handleFilesUploaded = (uploadedFiles) => {
-    setFiles(uploadedFiles);
+
+  const handleLegalFilesUploaded = (uploadedFiles) => {
+    setLegalFiles(uploadedFiles);
   };
 
   /*#region AG GRID Handlers and Column Defination */
@@ -209,14 +194,7 @@ const Seller = () => {
 
   useEffect(() => {
     (async () => {
-      try {
-        setError(false);
-        const response = await axios.get("/sellers");
-        setRowData(response.data.data);
-      } catch (error) {
-        setError(true);
-        toast.error("Failed to fetch seller data");
-      }
+      await fetchAllSeller();
     })();
   }, []);
 
@@ -249,37 +227,89 @@ const Seller = () => {
     }
   };
 
-  /*#endregion API CALLS */
-
-  /*#region BUTTON CLICKS */
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
+  const fetchAllSeller = async () => {
+    try {
+      setError(false);
+      const response = await axios.get("/sellers");
+      setRowData(response.data.data);
+    } catch (error) {
+      setError(true);
+      toast.error("Failed to fetch seller data");
     }
+  };
 
-    // Convert 'enable' field to a number
-    const formDataWithNumber = {
+  const uploadAocMedia = async () => {
+    if (!aocFiles?.length) return;
+
+    setResetAocDropzone(false);
+
+    try {
+      const response = await uploadApiCall(aocFiles);
+
+      // Reset Dropzone after submitting
+      setAocFiles([]);
+      setResetAocDropzone(true);
+
+      return response;
+    } catch (error) {
+      // Handle errors
+      console.error("Error:", error);
+    }
+  };
+
+  const uploadLegalMedia = async () => {
+    if (!legalFiles?.length) return;
+
+    setResetLegalDropzone(false);
+
+    try {
+      const response = await uploadApiCall(legalFiles);
+
+      // Reset Dropzone after submitting
+      setLegalFiles([]);
+      setResetLegalDropzone(true);
+
+      return response;
+    } catch (error) {
+      // Handle errors
+      console.error("Error:", error);
+    }
+  };
+
+  const uploadApiCall = async (filesdata) => {
+    try {
+      const formData = new FormData();
+      filesdata.forEach((file) => formData.append("file", file));
+
+      const response = await axios.post("/media/upload", formData);
+
+      return response.data.data;
+    } catch (error) {}
+  };
+
+  const addUpdateSeller = async (aocFileArray = [], legalFileArray = []) => {
+    let updatedFomData = {};
+
+    updatedFomData = {
       ...formData,
       enable: parseInt(formData.enable, 10),
+      aoc_file: aocFileArray,
+      legal_notary_file: legalFileArray,
     };
 
     const url = isEdit ? `/sellers/${editedSellerId}` : "/sellers";
-    console.log("formData====>", formData);
-    axios
+    console.log("formDataWithNumber====>", updatedFomData);
+    await axios
       .request({
         url,
         method: isEdit ? "put" : "post",
-        data: formDataWithNumber,
+        data: updatedFomData,
       })
       .then(async (result) => {
-        console.log(result);
+        console.log("result======>", result);
         if (result) {
           toast.success(isEdit ? "Updated Successfully" : "Added Successfully");
-          const getResponse = await axios.get("/sellers");
-          setRowData(getResponse.data.data);
+          await fetchAllSeller();
 
           // Scroll to the top of the page
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -296,6 +326,27 @@ const Seller = () => {
       });
   };
 
+  /*#endregion API CALLS */
+
+  /*#region BUTTON CLICKS */
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const aocFileArray = await uploadAocMedia();
+
+    console.log("aocFileArray=====>", aocFileArray);
+
+    const legalFileArray = await uploadLegalMedia();
+
+    console.log("legalFileArray=====>", legalFileArray);
+    await addUpdateSeller(aocFileArray, legalFileArray);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -310,6 +361,7 @@ const Seller = () => {
     setEditedSellerId(null);
     setIsViewModalOpen(false);
     setSelectedSellerDetails(null);
+
     setFormData({
       seller_commercial_name: "",
       seller_legal_name: "",
@@ -465,21 +517,26 @@ const Seller = () => {
                       /> */}
 
                       <Dropzone
-                        onFilesUploaded={handleFilesUploaded}
-                        resetFiles={resetDropzone}
+                        onFilesUploaded={handleAocFilesUploaded}
+                        resetFiles={resetAocDropzone}
                       />
                     </InputGroup>
                   </FormGroup>
                   <FormGroup>
                     <Label for="legal_notary_file">Legal Notary File</Label>
                     <InputGroup className="input-group-alternative">
-                      <Input
+                      {/* <Input
                         id="legal_notary_file"
                         name="legal_notary_file"
                         value={formData.legal_notary_file}
                         placeholder="Legal Notary File"
                         type="text"
                         onChange={handleChange}
+                      /> */}
+
+                      <Dropzone
+                        onFilesUploaded={handleLegalFilesUploaded}
+                        resetFiles={resetLegalDropzone}
                       />
                     </InputGroup>
                   </FormGroup>
@@ -513,7 +570,7 @@ const Seller = () => {
                       className="mt-4"
                       color={isEdit ? "info" : "primary"}
                       type="button"
-                      onClick={handleSubmit1}
+                      onClick={handleSubmit}
                     >
                       {isEdit ? "Update" : "Submit"}
                     </Button>
