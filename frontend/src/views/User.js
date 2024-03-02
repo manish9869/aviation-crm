@@ -8,12 +8,10 @@ import {
   FormGroup,
   Form,
   Row,
-  Col,
   Button,
   Input,
   Label,
   InputGroup,
-  ModalFooter,
   CustomInput,
 } from "reactstrap";
 import Select from "react-select";
@@ -91,7 +89,7 @@ const User = () => {
         toast.error("Failed to delete User");
       }
     } catch (error) {
-      console.error(error);
+      console.log(error);
       toast.error("An error occurred while deleting User");
     }
   };
@@ -254,11 +252,6 @@ const User = () => {
         label: seller.seller_commercial_name,
       }));
 
-      const optionsWithDefault = [
-        { value: "-1", label: "Select Seller" },
-        ...sellersOptions,
-      ];
-
       // Set the state with the options
       setFetchSellers(sellersOptions);
 
@@ -274,8 +267,6 @@ const User = () => {
       await fetchData();
     })();
   }, []);
-
-  useEffect(() => {}, []);
 
   const fetchData = async () => {
     try {
@@ -315,16 +306,10 @@ const User = () => {
       if (response.status === 200) {
         const userDetails = response.data.data;
 
-        console.log(userDetails);
         setSelectedSellerDDL({
           value: userDetails.seller.seller_id,
           label: userDetails.seller.seller_commercial_name,
         });
-
-        console.log(
-          "setSelectedSellerDDL========================>",
-          selectedSellerDDL
-        );
 
         // Set form fields with user details
         setFormData({

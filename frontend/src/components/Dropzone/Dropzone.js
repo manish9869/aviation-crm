@@ -10,13 +10,6 @@ const Dropzone = ({ onFilesUploaded, resetFiles }) => {
 
   const onDrop = useCallback(
     (acceptedFiles, rejectedFiles) => {
-      console.log("files==================>", files, resetFiles);
-      console.log(
-        "acceptedFiles==================>",
-        acceptedFiles,
-        resetFiles
-      );
-      console.log("rejectedFiles", rejectedFiles);
       if (acceptedFiles?.length) {
         // Create an array of objects with previews
         const updatedFiles = acceptedFiles.map((file) =>
@@ -25,7 +18,6 @@ const Dropzone = ({ onFilesUploaded, resetFiles }) => {
         // Update the files state with the new files
         setFiles((previousFiles) => [...previousFiles, ...updatedFiles]);
 
-        console.log("files==================>", files);
         // Call onFilesUploaded with the updated files array
         onFilesUploaded((previousFiles) => [...previousFiles, ...updatedFiles]);
       }
@@ -48,14 +40,12 @@ const Dropzone = ({ onFilesUploaded, resetFiles }) => {
   });
 
   useEffect(() => {
-    console.log("Use Effect Reset Calls===============>", resetFiles);
     if (resetFiles) {
       setFiles([]);
     }
   }, [resetFiles]);
 
   useEffect(() => {
-    console.log("Use Effect Files===============>", files);
     // Revoke the data uris to avoid memory leaks
     return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
   }, [files]);

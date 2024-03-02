@@ -8,7 +8,6 @@ import { ResponseHandlerInterceptor } from './helpers/ResponseHandlerInterceptor
 import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 import helmet from 'helmet';
 import * as dotenv from 'dotenv';
-import { createConnection } from 'typeorm';
 dotenv.config();
 
 async function bootstrap() {
@@ -19,7 +18,11 @@ async function bootstrap() {
   // middlewares, express specific
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginEmbedderPolicy: true,
+    }),
+  );
 
   const { httpAdapter } = app.get(HttpAdapterHost);
 
@@ -33,7 +36,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: ['http://localhost:3000', 'http://localhost:3232'],
     methods: ['GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'],
     credentials: true,
   });
