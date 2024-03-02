@@ -67,8 +67,10 @@ const User = () => {
     // Fetch user details by ID and set form fields
     fetchSellers();
     fetchUserDetails(userId);
+    console.log("FormData--->" + formData);
     setIsEdit(true); // Set edit mode
     setEditeduserId(userId); // Set the ID of the user being edited
+    console.log(editeduserId);
   };
 
   const handleDelete = async (userId) => {
@@ -368,13 +370,35 @@ const User = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-
+    // if(!e.target){
+    //   const {name, value} = {"test", "test1"};
+    // }
+    if (e === null || e === undefined) {
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        seller: null,
+      }));
+      return;
+    }
+    let name = null;
+    let value = null;
+    if (e.hasOwnProperty("label")) {
+      name = "seller";
+      value = e.value;
+      const type = typeof value;
+      console.log(type);
+    } else {
+      name = e.target.name;
+      value = e.target.value;
+      const type = typeof value;
+      console.log(type);
+    }
     console.log("we are in Handle change for " + name + " : " + value);
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
     }));
+    console.log(formData);
   };
 
   const resetForm = () => {
@@ -600,7 +624,7 @@ const User = () => {
                           name="user_type"
                           id="user_type"
                           onChange={handleChange}
-                          // value={formData.user_type || ""}
+                          value={formData.user_type || ""}
                         >
                           <option value="">Select User Type</option>
                           {fetchusertypes.map((userType) => (
@@ -628,21 +652,31 @@ const User = () => {
                     <Label for="seller">Seller</Label>
                     {fetchsellers && fetchsellers.length > 0 ? (
                       <Select
+                        // value={formData.seller || ""}
+                        onChange={handleChange}
                         options={fetchsellers.map((seller) => ({
                           value: seller.seller_id.toString(),
                           label: seller.seller_commercial_name,
                         }))}
-                        value={fetchsellers.find(
-                          (seller) => seller.seller_id === formData.seller
-                        )}
-                        onChange={(selectedOption) => {
-                          setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            seller: selectedOption
-                              ? selectedOption.value
-                              : null,
-                          }));
-                        }}
+                        value={
+                          formData.seller
+                            ? {
+                                value: formData.seller, // Convert to string if necessary
+                                label:
+                                  fetchsellers.find((s) => s.seller_id === formData.seller)
+                                    ?.seller_commercial_name || '',
+                              }
+                            : null
+                        }
+                        // onChange={(selectedOption) => {
+                        //   setFormData((prevFormData) => ({
+                        //     ...prevFormData,
+                        //     seller: selectedOption
+                        //       ? selectedOption.value
+                        //       : null,
+                        //   }));
+                        // }}
+
                         isClearable={true}
                         isSearchable={true}
                       />
@@ -661,8 +695,8 @@ const User = () => {
                       type="reset"
                       onClick={() => {
                         resetForm();
-                        setIsEdit(false); // Reset edit mode
-                        setEditeduserId(null); // Reset edited user ID
+                        // setIsEdit(false); // Reset edit mode
+                        // setEditeduserId(null); // Reset edited user ID
                         // Clear the seller value in formData
                         setFormData((prevFormData) => ({
                           ...prevFormData,
