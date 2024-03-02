@@ -13,6 +13,8 @@ import {
   Input,
   Label,
   InputGroup,
+  ModalFooter,
+  CustomInput,
 } from "reactstrap";
 import Grid from "./../components/ag-grid/Grid";
 import axios from "axios";
@@ -20,6 +22,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
 import Dropzone from "components/Dropzone/Dropzone";
+import axiosInstance from "./../helper/axios";
 
 const Seller = () => {
   const [resetLegalDropzone, setResetLegalDropzone] = useState(false);
@@ -102,6 +105,8 @@ const Seller = () => {
       const response = await axios.get(`/sellers/${sellerId}`);
       if (response.status === 200) {
         const sellerDetails = response.data.data;
+
+        console.log("Seller Details: " + JSON.stringify(sellerDetails));
         setSelectedSellerDetails(sellerDetails);
         setIsViewModalOpen(true);
       } else {
@@ -149,6 +154,10 @@ const Seller = () => {
       tax_identification_number,
       contact_email,
       contact_name,
+      contact_phone_number,
+      aoc_file,
+      legal_notary_file,
+      enable,
     } = formData;
 
     if (!seller_commercial_name.trim()) {
@@ -175,10 +184,45 @@ const Seller = () => {
     if (!contact_email.trim()) {
       errors.contact_email = "Contact Email is required";
       valid = false;
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(contact_email)) {
+        errors.contact_email = "Invalid email address";
+        valid = false;
+      }
     }
 
     if (!contact_name.trim()) {
       errors.contact_name = "Contact Name is required";
+      valid = false;
+    }
+
+    if (!contact_phone_number.trim()) {
+      errors.contact_phone_number = "Contact Phone Number is required";
+      valid = false;
+    } else {
+      const phoneRegex = /^\d{10}$/; // Assuming a 10-digit phone number
+      if (!phoneRegex.test(contact_phone_number)) {
+        errors.contact_phone_number = "Invalid phone number";
+        valid = false;
+      }
+    }
+
+    if (!aoc_file.trim()) {
+      errors.aoc_file = "AOC File is required";
+      valid = false;
+    }
+
+    if (!legal_notary_file.trim()) {
+      errors.legal_notary_file = "Legal Notary File is required";
+      valid = false;
+    }
+
+    if (enable === null) {
+      errors.enable = "Enable is required";
+      valid = false;
+    } else if (isNaN(enable) || enable < 0) {
+      errors.enable = "Enable must be a valid non-negative number";
       valid = false;
     }
 
@@ -386,6 +430,21 @@ const Seller = () => {
     setSelectedSellerDetails(null);
   };
 
+  const labelsMapping = {
+    seller_id: "Seller Id",
+    seller_commercial_name: "Seller Commercial Name",
+    seller_legal_name: "Seller Legal Name",
+    address: "Address",
+    tax_identification_number: "Tax Identification Number",
+    contact_email: "Contact Email",
+    contact_name: "Contact Name",
+    contact_phone_number: "Contact Phone Number",
+    aoc_file: "AOC File",
+    legal_notary_file: "Legal Notary File",
+    enable: "Enable",
+    date_time_insert: "Inserted Date",
+  };
+
   /*#endregion MODAL CLOSE */
 
   return (
@@ -437,6 +496,11 @@ const Seller = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
+                    {formErrors.seller_legal_name && (
+                      <small className="text-danger">
+                        {formErrors.seller_legal_name}
+                      </small>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <Label for="address">Address</Label>
@@ -450,6 +514,11 @@ const Seller = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
+                    {formErrors.address && (
+                      <small className="text-danger">
+                        {formErrors.address}
+                      </small>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <Label for="id_number">Tax Identification Number</Label>
@@ -463,6 +532,11 @@ const Seller = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
+                    {formErrors.tax_identification_number && (
+                      <small className="text-danger">
+                        {formErrors.tax_identification_number}
+                      </small>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <Label for="contactemail">Contact Email</Label>
@@ -477,6 +551,11 @@ const Seller = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
+                    {formErrors.contact_email && (
+                      <small className="text-danger">
+                        {formErrors.contact_email}
+                      </small>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <Label for="contactname">Contact Name</Label>
@@ -490,6 +569,11 @@ const Seller = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
+                    {formErrors.contact_name && (
+                      <small className="text-danger">
+                        {formErrors.contact_name}
+                      </small>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <Label for="contactPhoneNumber">Contact Phone Number</Label>
@@ -503,6 +587,11 @@ const Seller = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
+                    {formErrors.contact_phone_number && (
+                      <small className="text-danger">
+                        {formErrors.contact_phone_number}
+                      </small>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <Label for="aoc_file">AOC File</Label>
@@ -521,6 +610,11 @@ const Seller = () => {
                         resetFiles={resetAocDropzone}
                       />
                     </InputGroup>
+                    {formErrors.aoc_file && (
+                      <small className="text-danger">
+                        {formErrors.aoc_file}
+                      </small>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <Label for="legal_notary_file">Legal Notary File</Label>
@@ -539,19 +633,32 @@ const Seller = () => {
                         resetFiles={resetLegalDropzone}
                       />
                     </InputGroup>
+                    {formErrors.legal_notary_file && (
+                      <small className="text-danger">
+                        {formErrors.legal_notary_file}
+                      </small>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <Label for="enable">Enable</Label>
-                    <InputGroup className="input-group-alternative">
-                      <Input
-                        id="enable"
-                        name="enable"
-                        placeholder="enable"
-                        type="number"
-                        value={formData.enable}
-                        onChange={handleChange}
-                      />
-                    </InputGroup>
+                    <CustomInput
+                      type="switch"
+                      id="enable"
+                      name="enable"
+                      onChange={(e) =>
+                        handleChange({
+                          target: {
+                            name: "enable",
+                            value: e.target.checked ? 1 : 0,
+                          },
+                        })
+                      }
+                      checked={formData.enable === 1}
+                      label={formData.enable === 1 ? "Enabled" : "Disabled"}
+                    />
+                    {formErrors.enable && (
+                      <small className="text-danger">{formErrors.enable}</small>
+                    )}
                   </FormGroup>
                   <div className="text-center">
                     <Button
@@ -588,6 +695,7 @@ const Seller = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
+                idKey="seller_id"
               />
             </div>
           </div>
@@ -599,6 +707,7 @@ const Seller = () => {
         isOpen={isViewModalOpen}
         onClose={handleCloseViewModal}
         data={selectedSellerDetails}
+        labelsMapping={labelsMapping}
       />
     </>
   );

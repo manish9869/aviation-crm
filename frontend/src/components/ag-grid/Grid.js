@@ -3,7 +3,7 @@ import { AgGridReact } from "ag-grid-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEdit, faTrashAlt, faEye } from "@fortawesome/free-solid-svg-icons";
 
-const Grid = ({ rowData, columnDefs, onEdit, onDelete, onView }) => {
+const Grid = ({ rowData, columnDefs, onEdit, onDelete, onView, idKey }) => {
   const actionsCellRenderer = (params) => (
     <>
       <FontAwesomeIcon
@@ -11,21 +11,21 @@ const Grid = ({ rowData, columnDefs, onEdit, onDelete, onView }) => {
         color="green"
         size="lg"
         className="mr-2 icon-hover"
-        onClick={() => onView(params.data.seller_id)}
+        onClick={() => onView(params.data[idKey])}
       />
       <FontAwesomeIcon
         icon={faEdit}
         color="blue"
         size="lg"
         className="mr-2 icon-hover"
-        onClick={() => onEdit(params.data.seller_id)}
+        onClick={() => onEdit(params.data[idKey])}
       />
       <FontAwesomeIcon
         icon={faTrashAlt}
         color="red"
         size="lg"
         className="icon-hover"
-        onClick={() => onDelete(params.data.seller_id)}
+        onClick={() => onDelete(params.data[idKey])}
       />
     </>
   );

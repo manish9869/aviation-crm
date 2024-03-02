@@ -33,22 +33,23 @@ import {
   Col,
 } from "reactstrap";
 import axios from "axios";
-import { BrowserRouter, Route, Routes, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    axios
+    await axios
       .post("/auth/login", {
         email,
         password,
       })
       .then((result) => {
         console.log(result);
+        localStorage.setItem("accessToken", result.data.data.access_token);
         navigate("/admin/index");
       })
       .catch((err) => console.log(err));
