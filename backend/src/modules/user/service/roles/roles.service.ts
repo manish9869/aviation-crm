@@ -32,10 +32,10 @@ export class RolesService {
       role_id: id,
       ...updateRoleDto,
     });
+
     return await this.roleRepository.save(role);
   }
 
-  
   async remove(id: number): Promise<number | undefined> {
     // Check if there are any references to this role in the user table
     const usersWithRoleId = await this.userRepository.find({

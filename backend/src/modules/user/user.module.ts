@@ -13,20 +13,37 @@ import { UserTypeService } from './service/user-type/user-type.service';
 import { SellerService } from './service/seller/seller.service';
 import { SellerController } from './controller/seller/seller.controller';
 import { Seller } from './entities/seller.entity';
+import { Currency } from './entities/currency.entity';
+import { CurrencyController } from './controller/currency/CurrencyController';
+import { CategoryController } from './controller/category/category.controller';
+import { CurrencyService } from './service/currency/currency.service';
+import { CategoryService } from './service/category/category.service';
+import { Category } from './entities/category.entity';
+import { Fleet } from './entities/fleet.entity';
+import { FleetService } from './service/fleet/fleet.service';
+import { FleetController } from './controller/fleet/fleet.controller';
 
 @Module({
   imports: [
     HttpServiceModule,
-    TypeOrmModule.forFeature([Roles]),
-    TypeOrmModule.forFeature([UserType]),
-    TypeOrmModule.forFeature([User]),
-    TypeOrmModule.forFeature([Seller]),
+    TypeOrmModule.forFeature([
+      Roles,
+      UserType,
+      User,
+      Seller,
+      Currency,
+      Category,
+      Fleet,
+    ]),
   ],
   controllers: [
     RolesController,
     UserController,
     UserTypeController,
     SellerController,
+    CurrencyController,
+    CategoryController,
+    FleetController,
   ],
   providers: [
     Logger,
@@ -34,7 +51,18 @@ import { Seller } from './entities/seller.entity';
     UserService,
     UserTypeService,
     SellerService,
+    CurrencyService,
+    CategoryService,
+    FleetService,
   ],
-  exports: [RolesService, UserService, UserTypeService, SellerService],
+  exports: [
+    RolesService,
+    UserService,
+    UserTypeService,
+    SellerService,
+    CurrencyService,
+    CategoryService,
+    FleetService,
+  ],
 })
 export class UserModule {}

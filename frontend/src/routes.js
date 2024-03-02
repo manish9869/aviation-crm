@@ -6,7 +6,7 @@ import Maps from "views/Maps";
 import User from "views/User";
 import Seller from "views/Seller";
 import Forgot from "views/Forgot";
-
+import Fleet from "views/Fleet";
 
 
 var routes = [
@@ -23,6 +23,14 @@ var routes = [
     name: "User",
     icon: "ni ni-shop text-primary",
     component: <User />,
+    layout: "/admin",
+    sub_menu: [],
+  },
+  {
+    path: "/fleet",
+    name: "Fleet",
+    icon: "ni ni-shop text-primary",
+    component: <Fleet />,
     layout: "/admin",
     sub_menu: [],
   },
