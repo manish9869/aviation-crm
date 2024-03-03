@@ -4,7 +4,6 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { Container, Row } from "reactstrap";
 import styled, { keyframes } from "styled-components";
-
 const Airport = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,6 +12,8 @@ const Airport = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [sortField, setSortField] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
 
   const columns = [
     {
@@ -37,17 +38,18 @@ const Airport = () => {
       customFilterText: (term, row) => row.airporticaocode.includes(term),
     },
   ];
+
   const fetchAirports = async (
     page,
     size = perPage,
-    search = "",
-    sortField = "",
-    sortOrder = ""
+    search = debouncedSearchTerm,
+    sort = sortField,
+    order = sortOrder
   ) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `/airport?page=${page}&pageSize=${size}&searchTerm=${search}&sortField=${sortField}&sortOrder=${sortOrder}`
+        `/airport?page=${page}&pageSize=${size}&searchTerm=${search}&sortField=${sort}&sortOrder=${order}`
       );
       setData(response.data.data.data);
       setTotalRows(response.data.data.total);
@@ -58,13 +60,18 @@ const Airport = () => {
     }
   };
 
-  const handleAction = async (page, size, search, sortField, sortOrder) => {
-    await fetchAirports(page, size, search, sortField, sortOrder);
+  const handleAction = async (page, size, search, sort, order) => {
+    console.log("Handle Action", page, size, search, sort, order);
+
+    await fetchAirports(page, size, search, sort, order);
     setCurrentPage(page);
   };
+
   const handleSort = (column, sortDirection) => {
     const sortField = column.sortField;
-    const sortOrder = sortDirection === "asc" ? "ASC" : "DESC";
+    const sortOrder = sortDirection === "asc" ? "asc" : "desc";
+    setSortField(sortField);
+    setSortOrder(sortOrder);
     handleAction(
       currentPage,
       perPage,
@@ -83,8 +90,8 @@ const Airport = () => {
   }, [searchTerm]);
 
   useEffect(() => {
-    fetchAirports(1, perPage, debouncedSearchTerm);
-  }, [debouncedSearchTerm]);
+    fetchAirports(1, perPage, debouncedSearchTerm, sortField, sortOrder);
+  }, [debouncedSearchTerm, sortField, sortOrder, perPage]);
 
   return (
     <>
@@ -104,11 +111,24 @@ const Airport = () => {
               paginationPerPage={perPage}
               paginationRowsPerPageOptions={[10, 20, 30, 40, 50]}
               paginationTotalRows={totalRows}
-              onChangeRowsPerPage={(pageSize, page) =>
-                handleAction(page, pageSize, debouncedSearchTerm)
-              }
+              onChangeRowsPerPage={(pageSize, page) => {
+                setPerPage(pageSize);
+                handleAction(
+                  page,
+                  pageSize,
+                  debouncedSearchTerm,
+                  sortField,
+                  sortOrder
+                );
+              }}
               onChangePage={(page) =>
-                handleAction(page, perPage, debouncedSearchTerm)
+                handleAction(
+                  page,
+                  perPage,
+                  debouncedSearchTerm,
+                  sortField,
+                  sortOrder
+                )
               }
               onSort={(column, sortDirection) =>
                 handleSort(column, sortDirection)

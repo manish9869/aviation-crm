@@ -31,6 +31,7 @@ export class AirportService {
     pageSize: number;
   }> {
     try {
+      console.log('pageSize', pageSize);
       const cacheKey = `airports:all`;
       page = parseInt(page.toString(), 10);
       pageSize = parseInt(pageSize.toString(), 10);
