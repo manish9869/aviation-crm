@@ -49,6 +49,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@heroicons/react": "^2.1.1",
+    "ag-grid-enterprise": "^31.1.1",
     "ag-grid-react": "^31.1.1",
     "axios": "^1.6.7",
     "bootstrap": "4.6.2",
@@ -59,6 +60,7 @@
     "react": "18.2.0",
     "react-chartjs-2": "2.11.2",
     "react-copy-to-clipboard": "5.1.0",
+    "react-data-table-component": "^7.6.2",
     "react-datetime": "3.2.0",
     "react-dom": "18.2.0",
     "react-dropzone": "^14.2.3",
@@ -67,7 +69,8 @@
     "react-select": "^5.8.0",
     "react-toastify": "^10.0.4",
     "reactstrap": "8.10.0",
-    "sass": "1.69.5"
+    "sass": "1.69.5",
+    "styled-components": "^6.1.8"
   },
   "devDependencies": {
     "gulp": "4.0.2",

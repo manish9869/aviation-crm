@@ -2,6 +2,7 @@ import Index from "views/Index.js";
 import User from "views/User";
 import Seller from "views/Seller";
 import Fleet from "views/Fleet";
+import Airport from "views/airport";
 
 var routes = [
   {
@@ -33,6 +34,14 @@ var routes = [
     name: "Seller",
     icon: "ni ni-shop text-primary",
     component: <Seller />,
+    layout: "/admin",
+    sub_menu: [],
+  },
+  {
+    path: "/airport",
+    name: "Airport",
+    icon: "ni ni-shop text-primary",
+    component: <Airport />,
     layout: "/admin",
     sub_menu: [],
   },
