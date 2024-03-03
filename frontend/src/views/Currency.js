@@ -21,96 +21,95 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
 
-const Role = () => {
+const Currency = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedRoleDetails, setSelectedRoleDetails] = useState(null);
+  const [selectedCurrencyDetails, setSelectedCurrencyDetails] = useState(null);
   const [error, setError] = useState(false);
-  const [editedRoleId, setEditedRoleId] = useState(null);
+  const [editedCurrencyId, setEditedCurrencyId] = useState(null);
   const [rowData, setRowData] = useState([]);
-  const [isEdit, setIsEdit] = useState(false); // State to track if form is in edit mode
+  const [isEdit, setIsEdit] = useState(false); 
   const [formErrors, setFormErrors] = useState({
-    role_name: "",
-    role_description: "",
+    currency_name: "",
+    currency_abbreviation: "",
   });
 
   const [formData, setFormData] = useState({
-    role_name: "",
-    role_description: "",
+    currency_name: "",
+    currency_abbreviation: "",
   });
 
   const handleCloseViewModal = () => {
     setIsViewModalOpen(false);
-    setSelectedRoleDetails(null);
+    setSelectedCurrencyDetails(null);
   };
 
   const labelsMapping = {
-    role_name: "Role Name",
-    role_description: "Role Description",
-    // Add more mappings as needed
+    currency_name: "Currency Name",
+    currency_abbreviation: "Currency Abbreviation",
   };
 
-  const handleEdit = async (roleId) => {
+  const handleEdit = async (currencyId) => {
     try {
-      const response = await axios.get(`/roles/${roleId}`);
+      const response = await axios.get(`/currency/${currencyId}`);
       if (response.status === 200) {
-        const roleDetails = response.data.data;
+        const currencyDetails = response.data.data;
         setFormData({
-          role_name: roleDetails.role_name,
-          role_description: roleDetails.role_description,
+          currency_name: currencyDetails.currency_name,
+          currency_abbreviation: currencyDetails.currency_abbreviation,
         });
-        setIsEdit(true); // Set edit mode to true when editing
-        setEditedRoleId(roleId);
+        setIsEdit(true); // Set edit mode to true
+        setEditedCurrencyId(currencyId);
       } else {
-        toast.error("Failed to fetch role details");
+        toast.error("Failed to fetch currency details");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while fetching role details");
+      toast.error("An error occurred while fetching currency details");
     }
   };
 
-  const handleDelete = async (roleId) => {
+  const handleDelete = async (currencyId) => {
     try {
-      const response = await axios.delete(`/roles/${roleId}`);
+      const response = await axios.delete(`/currency/${currencyId}`);
       if (response.status === 200) {
-        toast.success("Role deleted successfully");
-        const updatedResponse = await axios.get("/roles");
+        toast.success("Currency deleted successfully");
+        const updatedResponse = await axios.get("/currency");
         setRowData(updatedResponse.data.data);
       } else {
-        toast.error("Failed to delete role");
+        toast.error("Failed to delete currency");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while deleting role");
+      toast.error("An error occurred while deleting currency");
     }
   };
 
-  const handleView = async (roleId) => {
+  const handleView = async (currencyId) => {
     try {
-      const response = await axios.get(`/roles/${roleId}`);
+      const response = await axios.get(`/currency/${currencyId}`);
       if (response.status === 200) {
-        const roleDetails = response.data.data;
-        setSelectedRoleDetails(roleDetails);
+        const currencyDetails = response.data.data;
+        setSelectedCurrencyDetails(currencyDetails);
         setIsViewModalOpen(true);
       } else {
-        toast.error("Failed to fetch role details");
+        toast.error("Failed to fetch currency details");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while fetching role details");
+      toast.error("An error occurred while fetching currency details");
     }
   };
 
   const [columnDefs, setColumnDefs] = useState([
     {
-      headerName: "Role Name",
-      field: "role_name",
+      headerName: "Currency Name",
+      field: "currency_name",
       filter: true,
       sortable: true,
     },
     {
-      headerName: "Role Description",
-      field: "role_description",
+      headerName: "Currency Abbreviation",
+      field: "currency_abbreviation",
       filter: true,
       sortable: true,
     },
@@ -119,12 +118,12 @@ const Role = () => {
   const validateForm = () => {
     let errors = {};
 
-    if (!formData.role_name.trim()) {
-      errors.role_name = "Role name is required";
+    if (!formData.currency_name.trim()) {
+      errors.currency_name = "Currency name is required";
     }
 
-    if (!formData.role_description.trim()) {
-      errors.role_description = "Role description is required";
+    if (!formData.currency_abbreviation.trim()) {
+      errors.currency_abbreviation = "Currency abbreviation is required";
     }
 
     setFormErrors(errors);
@@ -132,20 +131,20 @@ const Role = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const fetchRoles = async () => {
+  const fetchCurrencies = async () => {
     try {
       setError(false);
-      const response = await axios.get("/roles");
+      const response = await axios.get("/currency");
       setRowData(response.data.data);
       return response;
     } catch (error) {
       setError(true);
-      toast.error("Failed to fetch role data");
+      toast.error("Failed to fetch currency data");
     }
   };
 
   useEffect(() => {
-    fetchRoles();
+    fetchCurrencies();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -154,21 +153,25 @@ const Role = () => {
       return;
     }
     try {
-      const url = isEdit ? `/roles/${editedRoleId}` : "/roles";
+      const url = isEdit ? `/currency/${editedCurrencyId}` : "/currency";
       const method = isEdit ? "put" : "post";
       const response = await axios[method](url, formData);
       if (response.status === 200 || response.status === 201) {
-        toast.success(isEdit ? "Role updated successfully" : "Role added successfully");
-        const updatedResponse = await fetchRoles();
+        toast.success(
+          isEdit
+            ? "Currency updated successfully"
+            : "Currency added successfully"
+        );
+        const updatedResponse = await fetchCurrencies();
         setRowData(updatedResponse.data.data);
         window.scrollTo({ top: 0, behavior: "smooth" });
         resetForm();
       } else {
-        toast.error("Failed to submit role data");
+        toast.error("Failed to submit currency data");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while submitting role data");
+      toast.error("An error occurred while submitting currency data");
     }
   };
 
@@ -182,12 +185,12 @@ const Role = () => {
 
   const resetForm = () => {
     setIsEdit(false);
-    setEditedRoleId(null);
+    setEditedCurrencyId(null);
     setIsViewModalOpen(false);
-    setSelectedRoleDetails(null);
+    setSelectedCurrencyDetails(null);
     setFormData({
-      role_name: "",
-      role_description: "",
+      currency_name: "",
+      currency_abbreviation: "",
     });
     setFormErrors({});
   };
@@ -200,7 +203,7 @@ const Role = () => {
           <Col md={5}>
             <Card className="shadow">
               <CardHeader className="bg-transparent">
-                <h3 className="mb-0">{isEdit ? 'Update' : 'Add'} Role</h3>
+                <h3 className="mb-0">{isEdit ? "Update" : "Add"} Currency</h3>
               </CardHeader>
               <CardBody>
                 <Form role="form" onSubmit={handleSubmit}>
@@ -208,39 +211,56 @@ const Role = () => {
                     <InputGroup className="input-group-alternative mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="ni ni-hat-3" />
+                          <i className="ni ni-money-coins" />
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
-                        placeholder="Role Name"
-                        type="text"
-                        name="role_name"
-                        value={formData.role_name}
+                        placeholder="Currency Name"
+                        type="text" 
+                        name="currency_name"
+                        value={formData.currency_name}
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.role_name && <span className="text-danger">{formErrors.role_name}</span>}
+                    {formErrors.currency_name && (
+                      <span className="text-danger">
+                        {formErrors.currency_name}
+                      </span>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <InputGroup className="input-group-alternative mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="ni ni-email-83" />
+                          <i className="ni ni-money-bill" />
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
-                        placeholder="Role Description"
+                        placeholder="Currency Abbreviation"
                         type="text"
-                        name="role_description"
-                        value={formData.role_description}
+                        name="currency_abbreviation"
+                        value={formData.currency_abbreviation}
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.role_description && <span className="text-danger">{formErrors.role_description}</span>}
+                    {formErrors.currency_abbreviation && (
+                      <span className="text-danger">
+                        {formErrors.currency_abbreviation}
+                      </span>
+                    )}
                   </FormGroup>
                   <div className="text-center">
-                    <Button className="mr-2" color="danger" type="button" onClick={resetForm}>Clear</Button>
-                    <Button className="mr-2" color="primary" type="submit">{isEdit ? 'Update' : 'Submit'}</Button>
+                    <Button
+                      className="mr-2"
+                      color="danger"
+                      type="button"
+                      onClick={resetForm}
+                    >
+                      Clear
+                    </Button>
+                    <Button className="mr-2" color="primary" type="submit">
+                      {isEdit ? "Update" : "Submit"}
+                    </Button>
                   </div>
                 </Form>
               </CardBody>
@@ -254,7 +274,7 @@ const Role = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
-                idKey="role_id" // Correctly passing the identifier key
+                idKey="currency_Id" 
               />
             </div>
           </Col>
@@ -264,11 +284,11 @@ const Role = () => {
       <ViewModal
         isOpen={isViewModalOpen}
         onClose={handleCloseViewModal}
-        data={selectedRoleDetails}
-        labelsMapping={labelsMapping} // Pass labelsMapping to ViewModal
+        data={selectedCurrencyDetails}
+        labelsMapping={labelsMapping} 
       />
     </>
   );
 };
 
-export default Role;
+export default Currency;

@@ -21,96 +21,85 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
 
-const Role = () => {
+const Category = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedRoleDetails, setSelectedRoleDetails] = useState(null);
+  const [selectedCategoryDetails, setSelectedCategoryDetails] = useState(null);
   const [error, setError] = useState(false);
-  const [editedRoleId, setEditedRoleId] = useState(null);
+  const [editedCategoryId, setEditedCategoryId] = useState(null);
   const [rowData, setRowData] = useState([]);
-  const [isEdit, setIsEdit] = useState(false); // State to track if form is in edit mode
+  const [isEdit, setIsEdit] = useState(false);
   const [formErrors, setFormErrors] = useState({
-    role_name: "",
-    role_description: "",
+    category_name: "",
   });
 
   const [formData, setFormData] = useState({
-    role_name: "",
-    role_description: "",
+    category_name: "",
   });
 
   const handleCloseViewModal = () => {
     setIsViewModalOpen(false);
-    setSelectedRoleDetails(null);
+    setSelectedCategoryDetails(null);
   };
 
   const labelsMapping = {
-    role_name: "Role Name",
-    role_description: "Role Description",
-    // Add more mappings as needed
+    category_name: "Category Name",
   };
 
-  const handleEdit = async (roleId) => {
+  const handleEdit = async (categoryId) => {
     try {
-      const response = await axios.get(`/roles/${roleId}`);
+      const response = await axios.get(`/category/${categoryId}`);
       if (response.status === 200) {
-        const roleDetails = response.data.data;
+        const categoryDetails = response.data.data;
         setFormData({
-          role_name: roleDetails.role_name,
-          role_description: roleDetails.role_description,
+          category_name: categoryDetails.category_name,
         });
-        setIsEdit(true); // Set edit mode to true when editing
-        setEditedRoleId(roleId);
+        setIsEdit(true);
+        setEditedCategoryId(categoryId);
       } else {
-        toast.error("Failed to fetch role details");
+        toast.error("Failed to fetch category details");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while fetching role details");
+      toast.error("An error occurred while fetching category details");
     }
   };
 
-  const handleDelete = async (roleId) => {
+  const handleDelete = async (categoryId) => {
     try {
-      const response = await axios.delete(`/roles/${roleId}`);
+      const response = await axios.delete(`/category/${categoryId}`);
       if (response.status === 200) {
-        toast.success("Role deleted successfully");
-        const updatedResponse = await axios.get("/roles");
+        toast.success("Category deleted successfully");
+        const updatedResponse = await axios.get("/category");
         setRowData(updatedResponse.data.data);
       } else {
-        toast.error("Failed to delete role");
+        toast.error("Failed to delete category");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while deleting role");
+      toast.error("An error occurred while deleting category");
     }
   };
 
-  const handleView = async (roleId) => {
+  const handleView = async (categoryId) => {
     try {
-      const response = await axios.get(`/roles/${roleId}`);
+      const response = await axios.get(`/category/${categoryId}`);
       if (response.status === 200) {
-        const roleDetails = response.data.data;
-        setSelectedRoleDetails(roleDetails);
+        const categoryDetails = response.data.data;
+        setSelectedCategoryDetails(categoryDetails);
         setIsViewModalOpen(true);
       } else {
-        toast.error("Failed to fetch role details");
+        toast.error("Failed to fetch category details");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while fetching role details");
+      toast.error("An error occurred while fetching category details");
     }
   };
 
   const [columnDefs, setColumnDefs] = useState([
     {
-      headerName: "Role Name",
-      field: "role_name",
-      filter: true,
-      sortable: true,
-    },
-    {
-      headerName: "Role Description",
-      field: "role_description",
+      headerName: "Category Name",
+      field: "category_name",
       filter: true,
       sortable: true,
     },
@@ -119,12 +108,8 @@ const Role = () => {
   const validateForm = () => {
     let errors = {};
 
-    if (!formData.role_name.trim()) {
-      errors.role_name = "Role name is required";
-    }
-
-    if (!formData.role_description.trim()) {
-      errors.role_description = "Role description is required";
+    if (!formData.category_name.trim()) {
+      errors.category_name = "Category name is required";
     }
 
     setFormErrors(errors);
@@ -132,20 +117,20 @@ const Role = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const fetchRoles = async () => {
+  const fetchCategories = async () => {
     try {
       setError(false);
-      const response = await axios.get("/roles");
+      const response = await axios.get("/category");
       setRowData(response.data.data);
       return response;
     } catch (error) {
       setError(true);
-      toast.error("Failed to fetch role data");
+      toast.error("Failed to fetch category data");
     }
   };
 
   useEffect(() => {
-    fetchRoles();
+    fetchCategories();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -154,21 +139,21 @@ const Role = () => {
       return;
     }
     try {
-      const url = isEdit ? `/roles/${editedRoleId}` : "/roles";
+      const url = isEdit ? `/category/${editedCategoryId}` : "/category";
       const method = isEdit ? "put" : "post";
       const response = await axios[method](url, formData);
       if (response.status === 200 || response.status === 201) {
-        toast.success(isEdit ? "Role updated successfully" : "Role added successfully");
-        const updatedResponse = await fetchRoles();
+        toast.success(isEdit ? "Category updated successfully" : "Category added successfully");
+        const updatedResponse = await fetchCategories();
         setRowData(updatedResponse.data.data);
         window.scrollTo({ top: 0, behavior: "smooth" });
         resetForm();
       } else {
-        toast.error("Failed to submit role data");
+        toast.error("Failed to submit category data");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while submitting role data");
+      toast.error("An error occurred while submitting category data");
     }
   };
 
@@ -182,12 +167,11 @@ const Role = () => {
 
   const resetForm = () => {
     setIsEdit(false);
-    setEditedRoleId(null);
+    setEditedCategoryId(null);
     setIsViewModalOpen(false);
-    setSelectedRoleDetails(null);
+    setSelectedCategoryDetails(null);
     setFormData({
-      role_name: "",
-      role_description: "",
+      category_name: "",
     });
     setFormErrors({});
   };
@@ -200,7 +184,7 @@ const Role = () => {
           <Col md={5}>
             <Card className="shadow">
               <CardHeader className="bg-transparent">
-                <h3 className="mb-0">{isEdit ? 'Update' : 'Add'} Role</h3>
+                <h3 className="mb-0">{isEdit ? 'Edit Category' : 'Add Category'}</h3>
               </CardHeader>
               <CardBody>
                 <Form role="form" onSubmit={handleSubmit}>
@@ -208,39 +192,24 @@ const Role = () => {
                     <InputGroup className="input-group-alternative mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="ni ni-hat-3" />
+                          <i className="ni ni-folder-17" />
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input
-                        placeholder="Role Name"
+                        placeholder="Category Name"
                         type="text"
-                        name="role_name"
-                        value={formData.role_name}
+                        name="category_name"
+                        value={formData.category_name}
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.role_name && <span className="text-danger">{formErrors.role_name}</span>}
-                  </FormGroup>
-                  <FormGroup>
-                    <InputGroup className="input-group-alternative mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-email-83" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input
-                        placeholder="Role Description"
-                        type="text"
-                        name="role_description"
-                        value={formData.role_description}
-                        onChange={handleChange}
-                      />
-                    </InputGroup>
-                    {formErrors.role_description && <span className="text-danger">{formErrors.role_description}</span>}
+                    {formErrors.category_name && <span className="text-danger">{formErrors.category_name}</span>}
                   </FormGroup>
                   <div className="text-center">
                     <Button className="mr-2" color="danger" type="button" onClick={resetForm}>Clear</Button>
-                    <Button className="mr-2" color="primary" type="submit">{isEdit ? 'Update' : 'Submit'}</Button>
+                    <Button className="mr-2" color="primary" type="submit">
+                      {isEdit ? 'Update' : 'Submit'}
+                    </Button>
                   </div>
                 </Form>
               </CardBody>
@@ -254,7 +223,7 @@ const Role = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
-                idKey="role_id" // Correctly passing the identifier key
+                idKey="category_id" 
               />
             </div>
           </Col>
@@ -264,11 +233,11 @@ const Role = () => {
       <ViewModal
         isOpen={isViewModalOpen}
         onClose={handleCloseViewModal}
-        data={selectedRoleDetails}
-        labelsMapping={labelsMapping} // Pass labelsMapping to ViewModal
+        data={selectedCategoryDetails}
+        labelsMapping={labelsMapping}
       />
     </>
   );
 };
 
-export default Role;
+export default Category;
