@@ -19,7 +19,7 @@ import { AuthGuard } from 'src/modules/auth/auth.guard';
 export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
-  @UseGuards(AuthGuard)
+//  @UseGuards(AuthGuard)
   @Post()
   async create(@Body() createRoleDto: RoleDto): Promise<Roles> {
     try {

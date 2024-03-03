@@ -20,9 +20,12 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
 import Dropzone from "components/Dropzone/Dropzone";
+import { faTrashAlt } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axiosInstance from "./../helper/axios";
-
+import "./../components/Dropzone/dropzone.css";
 const Seller = () => {
+  const [isMediaDelete, setisMediaDelete] = useState(false);
   const [resetLegalDropzone, setResetLegalDropzone] = useState(false);
   const [resetAocDropzone, setResetAocDropzone] = useState(false);
   const [legalFiles, setLegalFiles] = useState([]);
@@ -33,6 +36,7 @@ const Seller = () => {
   const [editedSellerId, setEditedSellerId] = useState(null);
   const [rowData, setRowData] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
+
   const [formErrors, setFormErrors] = useState({
     seller_commercial_name: "",
     seller_legal_name: "",
@@ -69,10 +73,10 @@ const Seller = () => {
 
   /*#region AG GRID Handlers and Column Defination */
 
-  const handleEdit = (sellerId) => {
+  const handleEdit = async (sellerId) => {
     // Fetch seller details by ID and set form fields
     resetForm();
-    fetchSellerDetails(sellerId);
+    await fetchSellerDetails(sellerId);
     setIsEdit(true); // Set edit mode
     setEditedSellerId(sellerId); // Set the ID of the seller being edited
   };
@@ -86,10 +90,8 @@ const Seller = () => {
         toast.success("Seller deleted successfully");
 
         // After successfully deleting, fetch the latest data and update the grid
-        const getResponse = await axios.get("/seller");
+        const getResponse = await fetchAllSeller();
         setRowData(getResponse.data.data);
-        // const getResponse = await axios.get("/seller");
-        // setRowData(getResponse.data.data);
       } else {
         toast.error("Failed to delete Seller");
       }
@@ -105,7 +107,6 @@ const Seller = () => {
       if (response.status === 200) {
         const sellerDetails = response.data.data;
 
-        console.log("Seller Details: " + JSON.stringify(sellerDetails));
         setSelectedSellerDetails(sellerDetails);
         setIsViewModalOpen(true);
       } else {
@@ -127,12 +128,6 @@ const Seller = () => {
     {
       headerName: "Contact Name",
       field: "contact_name",
-      sortable: true,
-      filter: true,
-    },
-    {
-      headerName: "Contact Email",
-      field: "contact_email",
       sortable: true,
       filter: true,
     },
@@ -242,6 +237,13 @@ const Seller = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      console.log("formData====>", JSON.stringify(formData));
+      if (isMediaDelete) await updateMedia();
+    })();
+  }, [formData, isMediaDelete]);
+
   const fetchSellerDetails = async (sellerId) => {
     try {
       const response = await axios.get(`/sellers/${sellerId}`);
@@ -251,16 +253,7 @@ const Seller = () => {
 
         // Set form fields with seller details
         setFormData({
-          seller_commercial_name: sellerDetails.seller_commercial_name,
-          seller_legal_name: sellerDetails.seller_legal_name,
-          address: sellerDetails.address,
-          tax_identification_number: sellerDetails.tax_identification_number,
-          contact_email: sellerDetails.contact_email,
-          contact_name: sellerDetails.contact_name,
-          contact_phone_number: sellerDetails.contact_phone_number,
-          aoc_file: sellerDetails.aoc_file,
-          legal_notary_file: sellerDetails.legal_notary_file,
-          enable: sellerDetails.enable,
+          ...sellerDetails,
         });
       } else {
         toast.error("Failed to fetch seller details");
@@ -276,6 +269,7 @@ const Seller = () => {
       setError(false);
       const response = await axios.get("/sellers");
       setRowData(response.data.data);
+      return response;
     } catch (error) {
       setError(true);
       toast.error("Failed to fetch seller data");
@@ -283,11 +277,10 @@ const Seller = () => {
   };
 
   const uploadAocMedia = async () => {
-    if (!aocFiles?.length) return;
-
-    setResetAocDropzone(false);
-
     try {
+      if (!aocFiles?.length) return;
+
+      setResetAocDropzone(false);
       const response = await uploadApiCall(aocFiles);
 
       // Reset Dropzone after submitting
@@ -302,11 +295,10 @@ const Seller = () => {
   };
 
   const uploadLegalMedia = async () => {
-    if (!legalFiles?.length) return;
-
-    setResetLegalDropzone(false);
-
     try {
+      if (!legalFiles?.length) return;
+
+      setResetLegalDropzone(false);
       const response = await uploadApiCall(legalFiles);
 
       // Reset Dropzone after submitting
@@ -332,42 +324,76 @@ const Seller = () => {
   };
 
   const addUpdateSeller = async (aocFileArray = [], legalFileArray = []) => {
-    let updatedFomData = {};
+    try {
+      let updatedFomData = {};
+      if (Array.isArray(formData.aoc_file) && formData.aoc_file.length > 0) {
+        aocFileArray = [...formData.aoc_file, ...aocFileArray];
+      }
 
-    updatedFomData = {
+      if (
+        Array.isArray(formData.legal_notary_file) &&
+        formData.legal_notary_file.length > 0
+      ) {
+        legalFileArray = [...formData.legal_notary_file, ...legalFileArray];
+      }
+
+      updatedFomData = {
+        ...formData,
+        enable: parseInt(formData.enable, 10),
+        aoc_file: aocFileArray,
+        legal_notary_file: legalFileArray,
+      };
+
+      const url = isEdit ? `/sellers/${editedSellerId}` : "/sellers";
+      console.log("formDataWithNumber====>", updatedFomData);
+      await axios
+        .request({
+          url,
+          method: isEdit ? "put" : "post",
+          data: updatedFomData,
+        })
+        .then(async (result) => {
+          console.log("result======>", result);
+          if (result) {
+            toast.success(
+              isEdit ? "Updated Successfully" : "Added Successfully"
+            );
+            await fetchAllSeller();
+
+            // Scroll to the top of the page
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            // Reset form and edit mode after submission
+            resetForm();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          toast.error(
+            isEdit ? "Failed to update Seller" : "Failed to add Seller"
+          );
+        });
+    } catch (error) {}
+  };
+
+  const updateMedia = async () => {
+    const updatedFomData = {
       ...formData,
-      enable: parseInt(formData.enable, 10),
-      aoc_file: aocFileArray,
-      legal_notary_file: legalFileArray,
     };
 
-    const url = isEdit ? `/sellers/${editedSellerId}` : "/sellers";
-    console.log("formDataWithNumber====>", updatedFomData);
-    await axios
-      .request({
-        url,
-        method: isEdit ? "put" : "post",
-        data: updatedFomData,
-      })
-      .then(async (result) => {
-        console.log("result======>", result);
-        if (result) {
-          toast.success(isEdit ? "Updated Successfully" : "Added Successfully");
-          await fetchAllSeller();
+    console.log("updatedFomData====>", updatedFomData, editedSellerId);
 
-          // Scroll to the top of the page
-          window.scrollTo({ top: 0, behavior: "smooth" });
+    const url = `/sellers/media/${editedSellerId}`;
 
-          // Reset form and edit mode after submission
-          resetForm();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error(
-          isEdit ? "Failed to update Seller" : "Failed to add Seller"
-        );
-      });
+    const res = await axios.request({
+      url,
+      method: "put",
+      data: updatedFomData,
+    });
+
+    console.log("res=====>", res);
+
+    setisMediaDelete(false);
   };
 
   /*#endregion API CALLS */
@@ -375,50 +401,56 @@ const Seller = () => {
   /*#region BUTTON CLICKS */
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
 
-    if (!validateForm()) {
-      return;
-    }
+      if (!validateForm()) {
+        return;
+      }
 
-    const aocFileArray = await uploadAocMedia();
+      const aocFileArray = await uploadAocMedia();
 
-    console.log("aocFileArray=====>", aocFileArray);
+      console.log("aocFileArray=====>", aocFileArray);
 
-    const legalFileArray = await uploadLegalMedia();
+      const legalFileArray = await uploadLegalMedia();
 
-    console.log("legalFileArray=====>", legalFileArray);
-    await addUpdateSeller(aocFileArray, legalFileArray);
+      console.log("legalFileArray=====>", legalFileArray);
+      await addUpdateSeller(aocFileArray, legalFileArray);
+    } catch (error) {}
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    try {
+      const { name, value } = e.target;
 
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        [name]: value,
+      }));
+    } catch (error) {}
   };
 
   const resetForm = () => {
-    setIsEdit(false);
-    setEditedSellerId(null);
-    setIsViewModalOpen(false);
-    setSelectedSellerDetails(null);
+    try {
+      setIsEdit(false);
+      setEditedSellerId(null);
+      setIsViewModalOpen(false);
+      setSelectedSellerDetails(null);
 
-    setFormData({
-      seller_commercial_name: "",
-      seller_legal_name: "",
-      address: "",
-      tax_identification_number: "",
-      contact_email: "",
-      contact_name: "",
-      contact_phone_number: "",
-      aoc_file: "",
-      legal_notary_file: "",
-      enable: 0,
-    });
-    setFormErrors({});
+      setFormData({
+        seller_commercial_name: "",
+        seller_legal_name: "",
+        address: "",
+        tax_identification_number: "",
+        contact_email: "",
+        contact_name: "",
+        contact_phone_number: "",
+        aoc_file: "",
+        legal_notary_file: "",
+        enable: 0,
+      });
+      setFormErrors({});
+    } catch (error) {}
   };
 
   /*#endregion BUTTON CLICKS */
@@ -426,8 +458,10 @@ const Seller = () => {
   /*#region MODAL CLOSE */
 
   const handleCloseViewModal = () => {
-    setIsViewModalOpen(false);
-    setSelectedSellerDetails(null);
+    try {
+      setIsViewModalOpen(false);
+      setSelectedSellerDetails(null);
+    } catch (error) {}
   };
 
   const labelsMapping = {
@@ -446,6 +480,69 @@ const Seller = () => {
   };
 
   /*#endregion MODAL CLOSE */
+
+  const renderPdfIcon = () => (
+    <img
+      alt="Pdf Icon"
+      src={require("assets/img/dropzone/pdfIcon.svg").default}
+    />
+  );
+
+  const renderWordIcon = () => (
+    <img
+      src={require("assets/img/dropzone/docIcon.svg").default}
+      alt="Word Icon"
+      // You can set the path to your Word icon image
+    />
+  );
+
+  const renderImagePreview = (file) => (
+    <img
+      crossOrigin="anonymous"
+      src={file.path}
+      onLoad={() => {
+        URL.revokeObjectURL(file.path);
+      }}
+    />
+  );
+  const renderFileIcon = (file) => {
+    switch (file.extension) {
+      case "pdf":
+        return renderPdfIcon();
+      case "docx":
+        return renderWordIcon();
+      default:
+        return renderImagePreview(file);
+    }
+  };
+
+  const removeFile = async (name, fileType) => {
+    console.log("delete file name===>", name);
+    setisMediaDelete(true);
+    const response = await axios.delete(`/media/${name}`);
+
+    if (response.status === 200) {
+      toast.success("File Deleted Succesfully");
+      const fileArray =
+        fileType === "aoc"
+          ? [...formData.aoc_file]
+          : [...formData.legal_notary_file];
+
+      // Find the index of the file object with the specified filename
+      const index = fileArray.findIndex((file) => file.filename === name);
+
+      if (index !== -1) {
+        // Remove the file object from the array
+        fileArray.splice(index, 1);
+
+        // Update the state based on the fileType parameter
+        setFormData((prevState) => ({
+          ...prevState,
+          [fileType === "aoc" ? "aoc_file" : "legal_notary_file"]: fileArray,
+        }));
+      }
+    }
+  };
 
   return (
     <>
@@ -615,7 +712,30 @@ const Seller = () => {
                         {formErrors.aoc_file}
                       </small>
                     )}
+                    <div className="thumbs-container">
+                      {formData.aoc_file.length > 0 &&
+                        formData.aoc_file?.map((file) => (
+                          <div className="thumb" key={file.filename}>
+                            <div className="thumb-inner">
+                              {/* Render file icon based on file type */}
+                              {renderFileIcon(file)}
+                              <div className="icon-bg">
+                                <FontAwesomeIcon
+                                  icon={faTrashAlt}
+                                  color="red"
+                                  size="sm"
+                                  className="icon-hover"
+                                  onClick={() =>
+                                    removeFile(file.filename, "aoc")
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
                   </FormGroup>
+
                   <FormGroup>
                     <Label for="legal_notary_file">Legal Notary File</Label>
                     <InputGroup className="input-group-alternative">
@@ -638,6 +758,28 @@ const Seller = () => {
                         {formErrors.legal_notary_file}
                       </small>
                     )}
+                    <div className="thumbs-container">
+                      {formData.legal_notary_file.length > 0 &&
+                        formData.legal_notary_file?.map((file) => (
+                          <div className="thumb" key={file.filename}>
+                            <div className="thumb-inner">
+                              {/* Render file icon based on file type */}
+                              {renderFileIcon(file)}
+                              <div className="icon-bg">
+                                <FontAwesomeIcon
+                                  icon={faTrashAlt}
+                                  color="red"
+                                  size="sm"
+                                  className="icon-hover"
+                                  onClick={() =>
+                                    removeFile(file.filename, "legal")
+                                  }
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
                   </FormGroup>
                   <FormGroup>
                     <Label for="enable">Enable</Label>

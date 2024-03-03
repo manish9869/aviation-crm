@@ -11,10 +11,12 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
-
+import { FleetModule } from './modules/fleet/fleet.module';
+import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 @Module({
   imports: [
+    FleetModule,
     UploadsModule,
     AuthModule,
     UserModule,
@@ -27,6 +29,13 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public', 'media-files'), // Path to the directory where images are saved
       serveRoot: '/media-file', // URL path where images will be served
+    }),
+    RedisModule.forRoot({
+      config: {
+        host: process.env.REDIS_HOST,
+        port: parseInt(process.env.REDIS_PORT),
+        password: process.env.REDIS_PASSWORD,
+      },
     }),
   ],
   controllers: [AppController],

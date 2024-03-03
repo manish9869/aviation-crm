@@ -28,6 +28,11 @@ export class SellerService {
     return await this.sellerRepository.findOne({ where: { seller_id: id } });
   }
 
+  async updateMedia(id: number, mediaArray): Promise<any> {
+    await this.sellerRepository.update(id, mediaArray);
+    return await this.sellerRepository.findOne({ where: { seller_id: id } });
+  }
+
   async remove(id: number): Promise<void> {
     await this.sellerRepository.delete(id);
   }

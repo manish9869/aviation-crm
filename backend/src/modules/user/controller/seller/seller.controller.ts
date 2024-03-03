@@ -37,6 +37,14 @@ export class SellerController {
     return await this.sellerService.update(+id, sellerData);
   }
 
+  @Put('/media/:id')
+  async updateMedia(
+    @Param('id') id: string,
+    @Body() mediaArray: Partial<any>,
+  ): Promise<Seller> {
+    return await this.sellerService.updateMedia(+id, mediaArray);
+  }
+
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return await this.sellerService.remove(+id);

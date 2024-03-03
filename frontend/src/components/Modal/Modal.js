@@ -10,7 +10,6 @@ import {
 } from "reactstrap";
 
 const ViewModal = ({ isOpen, onClose, data, labelsMapping }) => {
-  console.log("Inside View Modal:  " + data);
   if (!isOpen || !data) {
     return null;
   }
