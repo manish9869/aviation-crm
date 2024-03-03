@@ -11,9 +11,11 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { FleetModule } from './modules/fleet/fleet.module';
 
 @Module({
   imports: [
+    FleetModule,
     UploadsModule,
     AuthModule,
     UserModule,
