@@ -12,6 +12,8 @@ const Grid = ({ rowData, columnDefs, onEdit, onDelete, onView, idKey }) => {
         size="lg"
         className="mr-2 icon-hover"
         onClick={() => onView(params.data[idKey])}
+        
+
       />
       <FontAwesomeIcon
         icon={faEdit}

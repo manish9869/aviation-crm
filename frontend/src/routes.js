@@ -3,6 +3,9 @@ import User from "views/User";
 import Seller from "views/Seller";
 import Fleet from "views/Fleet";
 import Airport from "views/airport";
+import Role from "views/Role";
+import Currency from "views/Currency";
+import Category from "views/Category";
 
 var routes = [
   {
@@ -22,21 +25,44 @@ var routes = [
     sub_menu: [],
   },
   {
-    path: "/fleet",
-    name: "Fleet",
+    path: "/category",
+    name: "Category",
     icon: "ni ni-shop text-primary",
-    component: <Fleet />,
+    component: <Category />,
     layout: "/admin",
     sub_menu: [],
   },
   {
+    path: "/fleet",
+    name: "Fleet",
+    icon: "ni ni-shop text-primary",
+    component: <Fleet />,
+    path: "/role",
+    name: "Role",
+    icon: "ni ni-shop text-primary",
+    component: <Role />,
+    layout: "/admin",
+    sub_menu: [],
+  },
+
+  {
+    path: "/currency",
+    name: "Currency",
+    icon: "ni ni-shop text-primary",
+    component: <Currency />,
+    layout: "/admin",
+    sub_menu: [],
+  },
+
+  {
     path: "/seller",
-    name: "Seller",
+    name: "seller",
     icon: "ni ni-shop text-primary",
     component: <Seller />,
     layout: "/admin",
     sub_menu: [],
   },
+
   {
     path: "/airport",
     name: "Airport",
