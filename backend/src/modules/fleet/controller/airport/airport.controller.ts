@@ -24,13 +24,21 @@ export class AirportController {
     @Query('page') page: number = 1,
     @Query('pageSize') pageSize: number = 10,
     @Query('searchTerm') searchTerm: string = '',
+    @Query('sortField') sortField: string = '', // New parameter for sorting field
+    @Query('sortOrder') sortOrder: 'asc' | 'desc' = 'asc', // New parameter for sorting direction
   ): Promise<{
     data: Airport[];
     total: number;
     page: number;
     pageSize: number;
   }> {
-    return this.airportService.findAll(page, pageSize, searchTerm);
+    return this.airportService.findAll(
+      page,
+      pageSize,
+      searchTerm,
+      sortField,
+      sortOrder,
+    );
   }
 
   @Get(':id')

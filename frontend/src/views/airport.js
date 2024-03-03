@@ -4,7 +4,6 @@ import axios from "axios";
 import DataTable from "react-data-table-component";
 import { Container, Row } from "reactstrap";
 import styled, { keyframes } from "styled-components";
-
 const Airport = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -12,6 +11,9 @@ const Airport = () => {
   const [perPage, setPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [sortField, setSortField] = useState("");
+  const [sortOrder, setSortOrder] = useState("");
 
   const columns = [
     {
@@ -37,11 +39,17 @@ const Airport = () => {
     },
   ];
 
-  const fetchAirports = async (page, size = perPage, search = "") => {
+  const fetchAirports = async (
+    page,
+    size = perPage,
+    search = debouncedSearchTerm,
+    sort = sortField,
+    order = sortOrder
+  ) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `/airport?page=${page}&pageSize=${size}&searchTerm=${search}`
+        `/airport?page=${page}&pageSize=${size}&searchTerm=${search}&sortField=${sort}&sortOrder=${order}`
       );
       setData(response.data.data.data);
       setTotalRows(response.data.data.total);
@@ -52,14 +60,38 @@ const Airport = () => {
     }
   };
 
-  const handleAction = async (page, size, search) => {
-    await fetchAirports(page, size, search);
+  const handleAction = async (page, size, search, sort, order) => {
+    console.log("Handle Action", page, size, search, sort, order);
+
+    await fetchAirports(page, size, search, sort, order);
     setCurrentPage(page);
   };
 
+  const handleSort = (column, sortDirection) => {
+    const sortField = column.sortField;
+    const sortOrder = sortDirection === "asc" ? "asc" : "desc";
+    setSortField(sortField);
+    setSortOrder(sortOrder);
+    handleAction(
+      currentPage,
+      perPage,
+      debouncedSearchTerm,
+      sortField,
+      sortOrder
+    );
+  };
+
   useEffect(() => {
-    fetchAirports(1, perPage, searchTerm);
+    const delayDebounceFn = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
   }, [searchTerm]);
+
+  useEffect(() => {
+    fetchAirports(1, perPage, debouncedSearchTerm, sortField, sortOrder);
+  }, [debouncedSearchTerm, sortField, sortOrder, perPage]);
 
   return (
     <>
@@ -79,10 +111,28 @@ const Airport = () => {
               paginationPerPage={perPage}
               paginationRowsPerPageOptions={[10, 20, 30, 40, 50]}
               paginationTotalRows={totalRows}
-              onChangeRowsPerPage={(pageSize, page) =>
-                handleAction(page, pageSize, searchTerm)
+              onChangeRowsPerPage={(pageSize, page) => {
+                setPerPage(pageSize);
+                handleAction(
+                  page,
+                  pageSize,
+                  debouncedSearchTerm,
+                  sortField,
+                  sortOrder
+                );
+              }}
+              onChangePage={(page) =>
+                handleAction(
+                  page,
+                  perPage,
+                  debouncedSearchTerm,
+                  sortField,
+                  sortOrder
+                )
               }
-              onChangePage={(page) => handleAction(page, perPage, searchTerm)}
+              onSort={(column, sortDirection) =>
+                handleSort(column, sortDirection)
+              }
               onSearch={(search) => setSearchTerm(search)}
               subHeader
               subHeaderComponent={
@@ -126,7 +176,7 @@ const Spinner = styled.div`
 const CustomLoader = () => (
   <div style={{ padding: "24px" }}>
     <Spinner />
-    <div>Fancy Loader...</div>
+    <div> Loader...</div>
   </div>
 );
 
