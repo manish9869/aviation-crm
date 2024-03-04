@@ -6,6 +6,7 @@ import Airport from "views/airport";
 import Role from "views/Role";
 import Currency from "views/Currency";
 import Category from "views/Category";
+import Privilege from "views/Privilege";
 
 var routes = [
   {
@@ -13,6 +14,14 @@ var routes = [
     name: "Dashboard",
     icon: "ni ni-shop text-primary",
     component: <Index />,
+    layout: "/admin",
+    sub_menu: [],
+  },
+  {
+    path: "/privilege",
+    name: "Privilege",
+    icon: "ni ni-shop text-primary",
+    component: <Privilege />,
     layout: "/admin",
     sub_menu: [],
   },
