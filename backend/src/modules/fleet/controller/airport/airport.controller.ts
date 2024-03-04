@@ -19,6 +19,7 @@ export class AirportController {
   async create(@Body() airportData: Partial<Airport>): Promise<Airport> {
     return this.airportService.create(airportData);
   }
+
   @Get()
   async findAll(
     @Query('page') page: number = 1,

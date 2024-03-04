@@ -76,8 +76,17 @@ export class AirportService {
       }
 
       const total = data.length;
-      const startIndex = (page - 1) * pageSize;
-      const endIndex = Math.min(startIndex + pageSize, total);
+      let startIndex = 0;
+      let endIndex = 0;
+
+      if (pageSize == -1) {
+        startIndex = 1;
+        endIndex = total;
+      } else {
+        startIndex = (page - 1) * pageSize;
+        endIndex = Math.min(startIndex + pageSize, total);
+      }
+
       const paginatedData = data.slice(startIndex, endIndex);
 
       return { data: paginatedData, total, page, pageSize };
