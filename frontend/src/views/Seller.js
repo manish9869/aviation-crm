@@ -45,8 +45,8 @@ const Seller = () => {
     contact_email: "",
     contact_name: "",
     contact_phone_number: "",
-    aoc_file: "",
-    legal_notary_file: "",
+    aoc_file: [],
+    legal_notary_file: [],
     enable: "",
   });
 
@@ -202,24 +202,26 @@ const Seller = () => {
       }
     }
 
-    // console.log("aoc_file.length", aoc_file.length);
-    // if (!aoc_file.length) {
-    //   errors.aoc_file = "AOC File is required";
-    //   valid = false;
-    // }
-    // console.log("legal_notary_file.length", legal_notary_file.length);
-    // if (!legal_notary_file.length) {
-    //   errors.legal_notary_file = "Legal Notary File is required";
-    //   valid = false;
-    // }
-
-    if (enable === null) {
-      errors.enable = "Enable is required";
-      valid = false;
-    } else if (isNaN(enable) || enable < 0) {
-      errors.enable = "Enable must be a valid non-negative number";
+    console.log("aoc_file", aoc_file);
+    console.log("legal_notary_file", legal_notary_file);
+    if (aoc_file.length == 0) {
+      errors.aoc_file = "Aoc file is required";
       valid = false;
     }
+
+    // Check if Legal Notary files are uploaded
+    if (legal_notary_file.length == 0) {
+      errors.legal_notary_file = "Legal notary file file is required";
+      valid = false;
+    }
+
+    // if (enable === null) {
+    //   errors.enable = "Enable is required";
+    //   valid = false;
+    // } else if (isNaN(enable) || enable < 0) {
+    //   errors.enable = "Enable must be a valid non-negative number";
+    //   valid = false;
+    // }
 
     // Set form errors state
     setFormErrors(errors);
@@ -565,7 +567,7 @@ const Seller = () => {
                     <Label for="seller_commercial_name">
                       Seller Commercial Name
                     </Label>
-                    <InputGroup className="input-group-alternative mb-3">
+                    <InputGroup className="input-group-alternative mb-1">
                       <Input
                         id="seller_commercial_name"
                         name="seller_commercial_name"
@@ -583,7 +585,7 @@ const Seller = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label for="seller_legal_name">Seller Legal Name</Label>
-                    <InputGroup className="input-group-alternative mb-3">
+                    <InputGroup className="input-group-alternative mb-1">
                       <Input
                         id="seller_legal_name"
                         name="seller_legal_name"
@@ -601,7 +603,7 @@ const Seller = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label for="address">Address</Label>
-                    <InputGroup className="input-group-alternative mb-3">
+                    <InputGroup className="input-group-alternative mb-1">
                       <Input
                         id="address"
                         name="address"
@@ -619,7 +621,7 @@ const Seller = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label for="id_number">Tax Identification Number</Label>
-                    <InputGroup className="input-group-alternative mb-3">
+                    <InputGroup className="input-group-alternative mb-1">
                       <Input
                         id="id_number"
                         name="tax_identification_number"
@@ -637,7 +639,7 @@ const Seller = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label for="contactemail">Contact Email</Label>
-                    <InputGroup className="input-group-alternative mb-3">
+                    <InputGroup className="input-group-alternative mb-1">
                       <Input
                         id="contactemail"
                         name="contact_email"
@@ -656,7 +658,7 @@ const Seller = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label for="contactname">Contact Name</Label>
-                    <InputGroup className="input-group-alternative mb-3">
+                    <InputGroup className="input-group-alternative mb-1">
                       <Input
                         id="contactname"
                         name="contact_name"
@@ -674,7 +676,7 @@ const Seller = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label for="contactPhoneNumber">Contact Phone Number</Label>
-                    <InputGroup className="input-group-alternative mb-3">
+                    <InputGroup className="input-group-alternative mb-1">
                       <Input
                         id="contactPhoneNumber"
                         name="contact_phone_number"
@@ -692,7 +694,7 @@ const Seller = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label for="aoc_file">AOC File</Label>
-                    <InputGroup className="input-group-alternative mb-3">
+                    <InputGroup className="input-group-alternative mb-1">
                       {/* <Input
                         id="aoc_file"
                         name="aoc_file"
@@ -738,16 +740,7 @@ const Seller = () => {
 
                   <FormGroup>
                     <Label for="legal_notary_file">Legal Notary File</Label>
-                    <InputGroup className="input-group-alternative">
-                      {/* <Input
-                        id="legal_notary_file"
-                        name="legal_notary_file"
-                        value={formData.legal_notary_file}
-                        placeholder="Legal Notary File"
-                        type="text"
-                        onChange={handleChange}
-                      /> */}
-
+                    <InputGroup className="input-group-alternative mb-1">
                       <Dropzone
                         onFilesUploaded={handleLegalFilesUploaded}
                         resetFiles={resetLegalDropzone}
@@ -798,9 +791,6 @@ const Seller = () => {
                       checked={formData.enable === 1}
                       label={formData.enable === 1 ? "Enabled" : "Disabled"}
                     />
-                    {formErrors.enable && (
-                      <small className="text-danger">{formErrors.enable}</small>
-                    )}
                   </FormGroup>
                   <div className="text-center">
                     <Button
