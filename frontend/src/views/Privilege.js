@@ -21,8 +21,18 @@ import "react-toastify/dist/ReactToastify.css";
 import routes from "./../routes"; // Import the routes array
 
 const Privilege = () => {
+  // Initialize user privileges for all routes with all privileges set to false
+  const initialUserPrivileges = {};
+  routes.forEach((route) => {
+    initialUserPrivileges[route.path] = {
+      read: false,
+      write: false,
+      delete: false,
+    };
+  });
+
   // State to hold user privileges
-  const [userPrivileges, setUserPrivileges] = useState({});
+  const [userPrivileges, setUserPrivileges] = useState(initialUserPrivileges);
   // State to hold the selected user type
   const [userType, setUserType] = useState("");
 
@@ -30,9 +40,15 @@ const Privilege = () => {
   const handlePrivilegeChange = (route, privilege, value) => {
     // Update user privileges based on the route and privilege
     const updatedPrivileges = { ...userPrivileges };
+    // Initialize the route path object if it doesn't exist
     if (!updatedPrivileges[route.path]) {
-      updatedPrivileges[route.path] = {};
+      updatedPrivileges[route.path] = {
+        read: false,
+        write: false,
+        delete: false,
+      };
     }
+    // Set the privilege to the provided value
     updatedPrivileges[route.path][privilege] = value;
     setUserPrivileges(updatedPrivileges);
   };
@@ -41,8 +57,13 @@ const Privilege = () => {
   const handleSelectAll = (privilege, checked) => {
     const updatedPrivileges = { ...userPrivileges };
     routes.forEach((route) => {
+      // Initialize the route path object if it doesn't exist
       if (!updatedPrivileges[route.path]) {
-        updatedPrivileges[route.path] = {};
+        updatedPrivileges[route.path] = {
+          read: false,
+          write: false,
+          delete: false,
+        };
       }
       updatedPrivileges[route.path][privilege] = checked;
     });
@@ -53,6 +74,7 @@ const Privilege = () => {
   const handleUserTypeChange = (e) => {
     setUserType(e.target.value);
   };
+
   // Function to handle form submission
   const handleSubmit = async () => {
     if (!userType) {
@@ -61,29 +83,25 @@ const Privilege = () => {
       return;
     }
 
-    // Check if any privilege is selected
-    const hasPrivilege = Object.values(userPrivileges).some((privilege) =>
-      Object.values(privilege).some((value) => value === true)
-    );
-
-    // If no privilege is selected, set all privileges to false
-    if (!hasPrivilege) {
-      const updatedPrivileges = {};
-      routes.forEach((route) => {
-        updatedPrivileges[route.path] = {
-          read: false,
-          write: false,
-          delete: false,
-        };
+    const privilegeArray = [];
+    // Iterate over the userPrivileges object to construct the array
+    Object.keys(userPrivileges).forEach((path) => {
+      const accessConfig = userPrivileges[path];
+      const routeName = routes.find((route) => route.path === path)?.name || "";
+      privilegeArray.push({
+        path: path.replace("/", ""), // Remove the leading '/'
+        access_config: accessConfig,
+        route_name: routeName,
       });
-      setUserPrivileges(updatedPrivileges);
-    }
+    });
 
-    // Send the user privileges data to the API
+    // Send the array of privilege objects to the API
     try {
       // Make API call here to save user privileges for the selected user type
       console.log("User Type:", userType);
-      console.log("User Privileges:", userPrivileges);
+      console.log("Privilege Array:", privilegeArray);
+
+      console.log("Privilege Array:", JSON.stringify(privilegeArray));
       // Display success message
       toast.success("Privileges assigned successfully!");
     } catch (error) {
