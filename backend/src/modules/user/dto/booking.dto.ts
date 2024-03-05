@@ -7,6 +7,9 @@ import {
 } from 'class-validator';
 
 export class BookingDto {
+  @IsOptional()
+  empty_leg_id: number;
+
   @IsString()
   @IsOptional()
   fbo_name: string;

@@ -27,6 +27,7 @@ import { EmptylegService } from './service/emptyleg/emptyleg.service';
 import { Emptyleg } from './entities/emptyleg.entity';
 import { AirportEmptylegControlService } from './service/airportemptylegcontrol/airportemptylegcontrol.service';
 import { AirportEmptylegControl } from './entities/airportemptylegcontrol.entity';
+import { AirportEmptylegControlController } from './controller/airportemptylegcontrol/airportemptylegcontrol.controller';
 @Module({
   imports: [
     HttpServiceModule,
@@ -51,6 +52,7 @@ import { AirportEmptylegControl } from './entities/airportemptylegcontrol.entity
     CategoryController,
     FleetController,
     EmptylegController,
+    AirportEmptylegControlController,
   ],
   providers: [
     Logger,

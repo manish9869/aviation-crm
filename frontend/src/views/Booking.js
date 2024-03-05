@@ -24,6 +24,11 @@ import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
 import YearPicker from "components/YearPicker/yearpicker";
 import Airport from "./airport";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import TimePicker from "react-time-picker";
+import "react-time-picker/dist/TimePicker.css";
+import "react-clock/dist/Clock.css";
 
 const Booking = () => {
   const [selectedYear, setSelectedYear] = useState(null);
@@ -52,8 +57,8 @@ const Booking = () => {
       // If airport is cleared, clear fbo_name
       setFormData((prevFormData) => ({
         ...prevFormData,
-        airport: null,
-        fbo_name: "",
+        airport_source: null,
+        fbo_source: "",
       }));
       // Hide additional form elements
       setShowAdditionalForm(false);
@@ -63,7 +68,7 @@ const Booking = () => {
     // You can perform additional logic based on the selected airport if needed
     setFormData((prevFormData) => ({
       ...prevFormData,
-      airport: selectedAirport.value,
+      airport_source: selectedAirport.value,
     }));
 
     // Show the additional form elements when an airport is selected
@@ -75,8 +80,8 @@ const Booking = () => {
       // If destination airport is cleared, clear destination FBO name
       setFormData((prevFormData) => ({
         ...prevFormData,
-        destination_airport: null,
-        destination_fbo_name: "",
+        airport_destination: null,
+        fbo_destination: "",
       }));
       // Hide additional form elements
       setShowAdditionalDestinationForm(false);
@@ -86,63 +91,63 @@ const Booking = () => {
     // You can perform additional logic based on the selected destination airport if needed
     setFormData((prevFormData) => ({
       ...prevFormData,
-      destination_airport: selectedDestinationAirport.value,
+      airport_destination: selectedDestinationAirport.value,
     }));
 
     // Show the additional form elements when a destination airport is selected
     setShowAdditionalDestinationForm(true);
   };
 
-  const handleFboNameChange = (selectedFboName) => {
-    // You can perform additional logic based on the selected FBO name if needed
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      fbo_name: selectedFboName ? selectedFboName.value : null,
-    }));
-  };
+  // const handleFboNameChange = (selectedFboName) => {
+  //   // You can perform additional logic based on the selected FBO name if needed
+  //   setFormData((prevFormData) => ({
+  //     ...prevFormData,
+  //     fbo_name: selectedFboName ? selectedFboName.value : null,
+  //   }));
+  // };
 
   const handleDestinationFboNameChange = (selectedDestinationFboName) => {
     // You can perform additional logic based on the selected destination FBO name if needed
     setFormData((prevFormData) => ({
       ...prevFormData,
-      destination_fbo_name: selectedDestinationFboName
+      fbo_destination: selectedDestinationFboName
         ? selectedDestinationFboName.value
         : null,
     }));
   };
 
   const [formErrors, setFormErrors] = useState({
-    tail_number: "",
     initial_date: "",
     initial_time: "",
     departure_date: "",
     departure_time: "",
-    numpax: "",
-    price_full_aircraft: "",
-    price_per_seat: "",
-    app_amenities_detail: "",
-    fbo_name: "",
-    currency: null, // Selected currency
-    airport: null, // Selected user type
-    fleet: null, // Selected fleet
-    fbo_name: "",
-  });
-
-  const [formData, setFormData] = useState({
-    tail_number: "",
-    initial_date: "",
-    initial_time: 0,
-    departure_date: 0,
-    departure_time: 0,
     numpax: 0,
     price_full_aircraft: "",
     price_per_seat: "",
     app_amenities_detail: "",
-    fbo_name: "",
+    airport_source: null,
+    fbo_source: "",
+    airport_destination: null,
+    fbo_destination: "",
     currency: null, // Selected currency
-    airport: null, // Selected user type
     fleet: null, // Selected fleet
-    fbo_name: "",
+  });
+
+  const [formData, setFormData] = useState({
+    initial_date: "",
+    initial_time: "",
+    departure_date: "",
+    departure_time: "",
+    numpax: 0,
+    price_full_aircraft: "",
+    price_per_seat: "",
+    app_amenities_detail: "",
+    airport_source: null,
+    fbo_source: "",
+    airport_destination: null,
+    fbo_destination: "",
+    currency: null, // Selected currency
+    fleet: null, // Selected fleet
   });
 
   /*#region AG GRID Handlers and Column Defination */
@@ -227,7 +232,6 @@ const Booking = () => {
 
     // Destructure formData
     const {
-      tail_number,
       initial_date,
       initial_time,
       departure_date,
@@ -236,74 +240,58 @@ const Booking = () => {
       price_full_aircraft,
       price_per_seat,
       app_amenities_detail,
-      fbo_name,
-      currency,
-      airport,
-      fleet,
+      airport_source,
+      fbo_source,
+      airport_destination,
+      fbo_destination,
+      currency, // Selected currency
+      fleet, // Selected fleet
     } = formData;
 
     // console.log(departure_time, currency, airport, fleet);
 
-    if (!tail_number.trim()) {
-      errors.tail_number = "Tail Number is required";
+    if (!initial_date) {
+      errors.initial_date = "Initial Date is required";
       valid = false;
     }
 
-    if (!initial_date.trim()) {
-      errors.initial_date = "Model Name is required";
-      valid = false;
-    }
-
-    if (!initial_time.trim()) {
-      errors.initial_time = "Hour Price is required";
-      valid = false;
-    } else if (isNaN(initial_time.trim())) {
-      errors.initial_time = "Hour Price is not a valid number";
+    if (!initial_time) {
+      errors.initial_time = "Initial Time is required";
       valid = false;
     }
 
     if (departure_date === null) {
-      errors.departure_date = "Knot Speed is required";
+      errors.departure_date = "Departure Date is required";
       valid = false;
     }
 
     if (departure_time === null) {
-      errors.departure_time = "Max Range is required";
+      errors.departure_time = "Departure Time is required";
       valid = false;
     }
 
     if (numpax === null) {
-      errors.departure_time = "Pax Number is required";
+      errors.numberOfPassengers = "Number of Passengers is required";
       valid = false;
     }
 
     if (!price_full_aircraft.trim()) {
-      errors.departure_time = "Brand is required";
+      errors.price_full_aircraft = "Aircraft Full Price is required";
       valid = false;
     }
 
     if (!price_per_seat.trim()) {
-      errors.price_per_seat = "Photo Interior is required";
+      errors.price_per_seat = "Price Per Seat is required";
       valid = false;
     }
 
     if (!app_amenities_detail.trim()) {
-      errors.app_amenities_detail = "Photo Exterior is required";
-      valid = false;
-    }
-
-    if (fbo_name === null) {
-      errors.fbo_name = "Yom is required";
+      errors.app_amenities_detail = "Ammenities Details is required";
       valid = false;
     }
 
     if (!currency) {
       errors.currency = "Currency Type is required";
-      valid = false;
-    }
-
-    if (!airport) {
-      errors.airport = "User Type is required";
       valid = false;
     }
 
@@ -336,7 +324,9 @@ const Booking = () => {
 
   const fetchAirports = async (value) => {
     try {
-      const response = await axios.get("/airport?page=1&pageSize=10&searchterm=" + value);
+      const response = await axios.get(
+        "/airport?page=1&pageSize=10&searchterm=" + value
+      );
       // console.log("User Type: " + response.data.data);
       const airportOptions = response.data.data.data.map((airport) => ({
         value: airport.airport_id,
@@ -393,15 +383,17 @@ const Booking = () => {
         setError(false);
 
         // Fetch currencys, user types, and fleets
-        const [currency, airport, fleet, fleetData] = await Promise.all([
-          fetchCurrency(),
-          // fetchCategory(),
-          fetchAirports(),
-          fetchFleets(),
-          axios.get("/fleet"),
-        ]);
+        const [currency, airport, fleet, airportemptyleg] =
+          await Promise.all([
+            fetchCurrency(),
+            // fetchCategory(),
+            fetchAirports(),
+            fetchFleets(),
+            // axios.get("/emptyleg"),
+            axios.get("/airportemptylegcontrol"),
+          ]);
 
-        setRowData(fleetData.data.data);
+        setRowData(airportemptyleg.data.data);
         // console.log("UserData=========> " + JSON.stringify(fleetData.data.data));
 
         // Update form data with fetched currencys, user types, and fleets
@@ -482,14 +474,14 @@ const Booking = () => {
     // Convert 'enable' field to a number
     const formDataWithNumber = {
       ...formData,
-      fbo_name: parseInt(formData.fbo_name, 10),
-      departure_date: parseInt(formData.departure_date, 10),
-      departure_time: parseInt(formData.departure_time, 10),
+      // fbo_name: parseInt(formData.fbo_name, 10),
+      // departure_date: parseInt(formData.departure_date, 10),
+      // departure_time: parseInt(formData.departure_time, 10),
       numpax: parseInt(formData.numpax, 10),
     };
 
     // console.log("Form Data after submitting " + formDataWithNumber);
-    const url = isEdit ? `/fleet/${editedfleetId}` : "/fleet";
+    const url = isEdit ? `/fleet/${editedfleetId}` : "/emptyleg/booking";
     console.log("formData====>", formData);
     axios
       .request({
@@ -555,23 +547,30 @@ const Booking = () => {
     console.log("selectedFleetDDL===>", selectedFleetDDL);
   };
 
-  const handleYearChange = (date) => {
-    if (date !== null) {
-      const year = date.getFullYear();
-      setSelectedYear(year);
+  // const handleYearChange = (date) => {
+  //   if (date !== null) {
+  //     const year = date.getFullYear();
+  //     setSelectedYear(year);
 
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        fbo_name: year.toString(),
-      }));
-    } else {
-      let valid = true;
-      const errors = {};
-      errors.fbo_name = "Year of Manufacture is required";
-      valid = false;
-      setFormErrors(errors);
-      return valid;
-    }
+  //     setFormData((prevFormData) => ({
+  //       ...prevFormData,
+  //       fbo_name: year.toString(),
+  //     }));
+  //   } else {
+  //     let valid = true;
+  //     const errors = {};
+  //     errors.fbo_name = "Year of Manufacture is required";
+  //     valid = false;
+  //     setFormErrors(errors);
+  //     return valid;
+  //   }
+  // };
+
+  const handleDateTimeChange = (date, fieldName) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [fieldName]: date,
+    }));
   };
 
   const resetForm = () => {
@@ -580,18 +579,19 @@ const Booking = () => {
     setIsViewModalOpen(false);
     setSelectedFleetDetails(null);
     setFormData({
-      tail_number: "",
       initial_date: "",
       initial_time: "",
       departure_date: "",
       departure_time: "",
-      paxnumber: "",
+      numpax: 0,
+      price_full_aircraft: "",
       price_per_seat: "",
       app_amenities_detail: "",
-      price_full_aircraft: "",
-      fbo_name: "",
+      airport_source: null,
+      fbo_source: "",
+      airport_destination: null,
+      fbo_destination: "",
       currency: null, // Selected currency
-      airport: null, // Selected user type
       fleet: null, // Selected fleet
     });
     setFormErrors({});
@@ -705,13 +705,16 @@ const Booking = () => {
                   <FormGroup>
                     <Label for="initial_date">Initial Date</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      <Input
+                      <DatePicker
                         id="initial_date"
                         name="initial_date"
-                        value={formData.initial_date}
-                        placeholder="Initial Date"
-                        type="text"
-                        onChange={handleChange}
+                        selected={formData.initial_date}
+                        dateFormat="yyyy-MM-dd"
+                        placeholderText="Select Initial Date"
+                        onChange={(date) =>
+                          handleDateTimeChange(date, "initial_date")
+                        }
+                        className="form-control"
                       />
                     </InputGroup>
                     {formErrors.initial_date && (
@@ -720,16 +723,20 @@ const Booking = () => {
                       </small>
                     )}
                   </FormGroup>
+
                   <FormGroup>
                     <Label for="initial_time">Initial Time</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      <Input
+                      <TimePicker
                         id="initial_time"
                         name="initial_time"
                         value={formData.initial_time}
-                        placeholder="Initial Time"
-                        type="text"
-                        onChange={handleChange}
+                        format="hh:mm:ss"
+                        onChange={(time) =>
+                          handleDateTimeChange(time, "initial_time")
+                        }
+                        className="form-control"
+                        clearIcon={null} // Remove the clear icon if not needed
                       />
                     </InputGroup>
                     {formErrors.initial_time && (
@@ -738,16 +745,20 @@ const Booking = () => {
                       </small>
                     )}
                   </FormGroup>
+
                   <FormGroup>
                     <Label for="departure_date">Departure Date</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      <Input
-                        id="id_number"
-                        name="Departure Date"
-                        value={formData.departure_date}
-                        placeholder="Knots Speed"
-                        type="number"
-                        onChange={handleChange}
+                      <DatePicker
+                        id="departure_date"
+                        name="departure_date"
+                        selected={formData.departure_date}
+                        dateFormat="yyyy-MM-dd"
+                        placeholderText="Select Departure Date"
+                        onChange={(date) =>
+                          handleDateTimeChange(date, "departure_date")
+                        }
+                        className="form-control"
                       />
                     </InputGroup>
                     {formErrors.departure_date && (
@@ -759,13 +770,16 @@ const Booking = () => {
                   <FormGroup>
                     <Label for="departure_time">Departure Time</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      <Input
+                      <TimePicker
                         id="departure_time"
                         name="departure_time"
                         value={formData.departure_time}
-                        placeholder="Departure Time"
-                        type="number"
-                        onChange={handleChange}
+                        format="hh:mm:ss"
+                        onChange={(time) =>
+                          handleDateTimeChange(time, "departure_time")
+                        }
+                        className="form-control"
+                        clearIcon={null} // Remove the clear icon if not needed
                       />
                     </InputGroup>
                     {formErrors.departure_time && (
@@ -834,7 +848,8 @@ const Booking = () => {
                         name="app_amenities_detail"
                         value={formData.app_amenities_detail}
                         placeholder="Ammenities"
-                        type="text"
+                        type="textarea" // Use type="textarea" for a multiline input
+                        rows={4} // Adjust the number of rows as needed
                         onChange={handleChange}
                       />
                     </InputGroup>
@@ -844,6 +859,7 @@ const Booking = () => {
                       </small>
                     )}
                   </FormGroup>
+
                   <br></br>
                   <h3 className="mb-0">
                     {isEdit ? "Edit Flight" : "Add Flight"}
@@ -878,20 +894,20 @@ const Booking = () => {
                     <>
                       {/* Additional form elements for FBO Name */}
                       <FormGroup>
-                        <Label for="fbo_name">FBO Name</Label>
+                        <Label for="fbo_source">Source FBO Name</Label>
                         <InputGroup className="input-group-alternative mb-3">
                           <Input
-                            id="fbo_name"
-                            name="fbo_name"
-                            value={formData.fbo_name}
+                            id="fbo_source"
+                            name="fbo_source"
+                            value={formData.fbo_source}
                             placeholder="FBO Name"
                             type="text"
                             onChange={handleChange}
                           />
                         </InputGroup>
-                        {formErrors.fbo_name && (
+                        {formErrors.fbo_source && (
                           <small className="text-danger">
-                            {formErrors.fbo_name}
+                            {formErrors.fbo_source}
                           </small>
                         )}
                       </FormGroup>
@@ -930,22 +946,22 @@ const Booking = () => {
                     <>
                       {/* Additional form elements for Destination FBO Name */}
                       <FormGroup>
-                        <Label for="destination_fbo_name">
+                        <Label for="fbo_destination">
                           Destination FBO Name
                         </Label>
                         <InputGroup className="input-group-alternative mb-3">
                           <Input
-                            id="destination_fbo_name"
-                            name="destination_fbo_name"
-                            value={formData.destination_fbo_name}
+                            id="fbo_destination"
+                            name="fbo_destination"
+                            value={formData.fbo_destination}
                             placeholder="Destination FBO Name"
                             type="text"
-                            onChange={handleDestinationFboNameChange}
+                            onChange={handleChange}
                           />
                         </InputGroup>
-                        {formErrors.destination_fbo_name && (
+                        {formErrors.fbo_destination && (
                           <small className="text-danger">
-                            {formErrors.destination_fbo_name}
+                            {formErrors.fbo_destination}
                           </small>
                         )}
                       </FormGroup>

@@ -61,6 +61,31 @@ export class EmptylegService {
     return emptylegResponse;
   }
 
+  // async findAllBooking(bookingdto: BookingDto): Promise<BookingDto>{
+
+  //   let emptylegReqBody: Emptyleg;
+
+  //   const airportemtylegcontrol = await this.emptylegControlService.findAll();
+  //   airportemtylegcontrol.forEach( (airportemtyleg) => {
+  //     emptylegReqBody = {
+  //       emptylegReqBody.fleet: airportemtyleg.fleet,
+  //     user: 1,
+  //     currency: bookingdto.currency,
+  //     initial_date: bookingdto.initial_date,
+  //     initial_time: bookingdto.initial_time,
+  //     departure_date: bookingdto.departure_date,
+  //     departure_time: bookingdto.departure_time,
+  //     numpax: bookingdto.numpax,
+  //     price_full_aircraft: bookingdto.price_full_aircraft,
+  //     price_per_seat: bookingdto.price_per_seat,
+  //     app_amenities_detail: bookingdto.app_amenities_detail,
+  //     }
+  //   })
+    
+
+  //   return null;
+  // }
+
   async create(emptylegDto: EmptylegDto): Promise<Emptyleg> {
     const emptyleg = this.emptylegRepository.create(emptylegDto);
     return await this.emptylegRepository.save(emptyleg);
