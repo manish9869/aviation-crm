@@ -6,6 +6,7 @@ import Airport from "views/airport";
 import Role from "views/Role";
 import Currency from "views/Currency";
 import Category from "views/Category";
+import Booking from "views/Booking";
 
 var routes = [
   {
@@ -37,6 +38,18 @@ var routes = [
     name: "Fleet",
     icon: "ni ni-shop text-primary",
     component: <Fleet />,
+    layout: "/admin",
+    sub_menu: [],
+  },
+  {
+    path: "/emptyleg",
+    name: "Booking",
+    icon: "ni ni-shop text-primary",
+    component: <Booking />,
+    layout: "/admin",
+    sub_menu: [],
+  },
+  {
     path: "/role",
     name: "Role",
     icon: "ni ni-shop text-primary",
@@ -56,7 +69,7 @@ var routes = [
 
   {
     path: "/seller",
-    name: "seller",
+    name: "Seller",
     icon: "ni ni-shop text-primary",
     component: <Seller />,
     layout: "/admin",

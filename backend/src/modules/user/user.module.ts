@@ -14,7 +14,7 @@ import { SellerService } from './service/seller/seller.service';
 import { SellerController } from './controller/seller/seller.controller';
 import { Seller } from './entities/seller.entity';
 import { Currency } from './entities/currency.entity';
-import { CurrencyController } from './controller/currency/CurrencyController';
+import { CurrencyController } from './controller/currency/currency.controller';
 import { CategoryController } from './controller/category/category.controller';
 import { CurrencyService } from './service/currency/currency.service';
 import { CategoryService } from './service/category/category.service';
@@ -22,7 +22,11 @@ import { Category } from './entities/category.entity';
 import { Fleet } from './entities/fleet.entity';
 import { FleetService } from './service/fleet/fleet.service';
 import { FleetController } from './controller/fleet/fleet.controller';
-
+import { EmptylegController } from './controller/emptyleg/emptyleg.controller';
+import { EmptylegService } from './service/emptyleg/emptyleg.service';
+import { Emptyleg } from './entities/emptyleg.entity';
+import { AirportEmptylegControlService } from './service/airportemptylegcontrol/airportemptylegcontrol.service';
+import { AirportEmptylegControl } from './entities/airportemptylegcontrol.entity';
 @Module({
   imports: [
     HttpServiceModule,
@@ -34,6 +38,8 @@ import { FleetController } from './controller/fleet/fleet.controller';
       Currency,
       Category,
       Fleet,
+      Emptyleg,
+      AirportEmptylegControl
     ]),
   ],
   controllers: [
@@ -44,6 +50,7 @@ import { FleetController } from './controller/fleet/fleet.controller';
     CurrencyController,
     CategoryController,
     FleetController,
+    EmptylegController,
   ],
   providers: [
     Logger,
@@ -54,6 +61,8 @@ import { FleetController } from './controller/fleet/fleet.controller';
     CurrencyService,
     CategoryService,
     FleetService,
+    EmptylegService,
+  AirportEmptylegControlService,
   ],
   exports: [
     RolesService,
@@ -63,6 +72,8 @@ import { FleetController } from './controller/fleet/fleet.controller';
     CurrencyService,
     CategoryService,
     FleetService,
+    EmptylegService,
+    AirportEmptylegControlService
   ],
 })
 export class UserModule {}

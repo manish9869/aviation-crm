@@ -19,12 +19,12 @@ const ViewModal = ({ isOpen, onClose, data, labelsMapping }) => {
       return <span>{data === 1 ? "True" : "False"}</span>;
     }
 
-    if (typeof data === "object") {
+    if (data !== null && typeof data === "object") {
       console.log("Inside modal " + JSON.stringify(data));
 
       // Extract specific properties if present
       const extractedValue =
-        data.role_name || data.user_type || data.seller_commercial_name;
+        data.role_name || data.user_type || data.seller_commercial_name || data.currency_name || data.category_name;
 
       console.log("Extracted Value----- " + extractedValue);
       if (extractedValue) {

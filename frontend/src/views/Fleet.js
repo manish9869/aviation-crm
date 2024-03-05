@@ -22,86 +22,98 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
+import YearPicker from "components/YearPicker/yearpicker";
 
 const Fleet = () => {
+  const [selectedYear, setSelectedYear] = useState(null);
+
+  // ... (other code)
+
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedUserDetails, setSelectedUserDetails] = useState(null);
+  const [selectedFleetDetails, setSelectedFleetDetails] = useState(null);
   const [error, setError] = useState(false);
-  const [editeduserId, setEditeduserId] = useState(null);
+  const [editedfleetId, setEditedfleetId] = useState(null);
   const [rowData, setRowData] = useState([]);
   const [isEdit, setIsEdit] = useState(false);
-  const [fetchrole, setFetchRoles] = useState([]);
-  const [fetchusertypes, setFetchUserTypes] = useState([]);
+  const [fetchcurrency, setFetchCurrency] = useState([]);
+  const [fetchcategory, setFetchCategory] = useState([]);
   const [fetchsellers, setFetchSellers] = useState([]);
-  const [isClearable, setIsClearable] = useState(true);
-  const [isSearchable, setIsSearchable] = useState(true);
+  const [selectedSellerDDL, setSelectedSellerDDL] = useState({});
 
   const [formErrors, setFormErrors] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
-    password: "",
-    profile_pic: "",
-    role: null, // Selected role
-    user_type: null, // Selected user type
+    tail_number: "",
+    model: "",
+    hour_price: "",
+    knots_speed: "",
+    max_range_nm: "",
+    pax_number: "",
+    brand: "",
+    photo_interior: "",
+    photo_exterior: "",
+    yom: "",
+    currency: null, // Selected currency
+    category: null, // Selected user type
     seller: null, // Selected seller
-    enable: "",
   });
 
   const [formData, setFormData] = useState({
-    firstname: "",
-    lastname: "",
-    email: "",
-    password: "",
-    profile_pic: "",
-    role: null, // Selected role
-    user_type: null, // Selected user type
+    tail_number: "",
+    model: "",
+    hour_price: 0,
+    knots_speed: 0,
+    max_range_nm: 0,
+    pax_number: 0,
+    brand: "",
+    photo_interior: "",
+    photo_exterior: "",
+    yom: "",
+    currency: null, // Selected currency
+    category: null, // Selected user type
     seller: null, // Selected seller
-    enable: 0,
   });
 
   /*#region AG GRID Handlers and Column Defination */
 
-  const handleEdit = (userId) => {
-    console.log("userId", userId);
+  const handleEdit = async (fleetId) => {
+    console.log("fleetId", fleetId);
     // Fetch user details by ID and set form fields
-    fetchSellers();
-    fetchUserDetails(userId);
+    await fetchSellers();
+    await fetchFleetDetails(fleetId);
     setIsEdit(true); // Set edit mode
-    setEditeduserId(userId); // Set the ID of the user being edited
+    setEditedfleetId(fleetId); // Set the ID of the user being edited
   };
 
-  const handleDelete = async (userId) => {
+  const handleDelete = async (fleetId) => {
     try {
-      console.log("Id: " + userId);
-      const response = await axios.delete(`/user/${userId}`);
+      console.log("Id: " + fleetId);
+      const response = await axios.delete(`/fleet/${fleetId}`);
 
       if (response.status === 200) {
         // Assuming your API returns a success status code
-        toast.success("User deleted successfully");
+        toast.success("Fleet deleted successfully");
 
         // After successfully deleting, fetch the latest data and update the grid
-        const getResponse = await axios.get("/user");
+        const getResponse = await axios.get("/fleet");
         setRowData(getResponse.data.data);
         // const getResponse = await axios.get("/user");
         // setRowData(getResponse.data.data);
       } else {
-        toast.error("Failed to delete User");
+        toast.error("Failed to delete Fleet");
       }
     } catch (error) {
       console.error(error);
-      toast.error("An error occurred while deleting User");
+      toast.error("An error occurred while deleting Fleet");
     }
   };
 
-  const handleView = async (userId) => {
+  const handleView = async (fleetId) => {
     try {
-      const response = await axios.get(`/user/${userId}`);
+      const response = await axios.get(`/fleet/${fleetId}`);
       if (response.status === 200) {
         console.log("We are inside handle view");
-        const userDetails = response.data.data;
-        console.log("User Details: " + JSON.stringify(userDetails));
-        setSelectedUserDetails(userDetails);
+        const fleetDetails = response.data.data;
+        console.log("Fleet Details: " + JSON.stringify(fleetDetails));
+        setSelectedFleetDetails(fleetDetails);
         setIsViewModalOpen(true);
       } else {
         toast.error("Failed to fetch user details");
@@ -114,20 +126,20 @@ const Fleet = () => {
 
   const [columnDefs, setColumnDefs] = useState([
     {
-      headerName: "First Name",
-      field: "firstname",
+      headerName: "Tail Number",
+      field: "tail_number",
       sortable: true,
       filter: true,
     },
     {
-      headerName: "Last Name",
-      field: "lastname",
+      headerName: "Model",
+      field: "model",
       sortable: true,
       filter: true,
     },
     {
-      headerName: "Contact Email",
-      field: "email",
+      headerName: "Hour Price",
+      field: "hour_price",
       sortable: true,
       filter: true,
     },
@@ -142,65 +154,83 @@ const Fleet = () => {
 
     // Destructure formData
     const {
-      firstname,
-      lastname,
-      email,
-      password,
-      profile_pic,
-      role,
-      user_type,
+      tail_number,
+      model,
+      hour_price,
+      knots_speed,
+      max_range_nm,
+      pax_number,
+      brand,
+      photo_interior,
+      photo_exterior,
+      yom,
+      currency,
+      category,
       seller,
-      enable,
     } = formData;
 
-    // console.log(profile_pic, role, user_type, seller);
+    // console.log(max_range_nm, currency, category, seller);
 
-    if (!firstname.trim()) {
-      errors.firstname = "First Name is required";
+    if (!tail_number.trim()) {
+      errors.tail_number = "Tail Number is required";
       valid = false;
     }
 
-    if (!lastname.trim()) {
-      errors.lastname = "Last Name is required";
+    if (!model.trim()) {
+      errors.model = "Model Name is required";
       valid = false;
     }
 
-    if (!email.trim()) {
-      errors.email = "Contact Email is required";
+    if (!hour_price.trim()) {
+      errors.hour_price = "Hour Price is required";
       valid = false;
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        errors.email = "Invalid email address";
-        valid = false;
-      }
-    }
-
-    if (!password.trim()) {
-      errors.password = "Password is required";
+    } else if (isNaN(hour_price.trim())) {
+      errors.hour_price = "Hour Price is not a valid number";
       valid = false;
     }
 
-    if (!profile_pic.trim()) {
-      errors.profile_pic = "Profile pic is required";
+    if (knots_speed === null) {
+      errors.knots_speed = "Knot Speed is required";
       valid = false;
     }
 
-    if (enable === null) {
-      errors.enable = "Enable is required";
-      valid = false;
-    } else if (isNaN(enable) || enable < 0) {
-      errors.enable = "Enable must be a valid non-negative number";
+    if (max_range_nm === null) {
+      errors.max_range_nm = "Max Range is required";
       valid = false;
     }
 
-    if (!role) {
-      errors.role = "Role is required";
+    if (pax_number === null) {
+      errors.max_range_nm = "Pax Number is required";
       valid = false;
     }
 
-    if (!user_type) {
-      errors.user_type = "User Type is required";
+    if (!brand.trim()) {
+      errors.max_range_nm = "Brand is required";
+      valid = false;
+    }
+
+    if (!photo_interior.trim()) {
+      errors.photo_interior = "Photo Interior is required";
+      valid = false;
+    }
+
+    if (!photo_exterior.trim()) {
+      errors.photo_exterior = "Photo Exterior is required";
+      valid = false;
+    }
+
+    if (yom === null) {
+      errors.yom = "Yom is required";
+      valid = false;
+    }
+
+    if (!currency) {
+      errors.currency = "Currency Type is required";
+      valid = false;
+    }
+
+    if (!category) {
+      errors.category = "User Type is required";
       valid = false;
     }
 
@@ -219,26 +249,26 @@ const Fleet = () => {
 
   /*#region API CALLS */
 
-  const fetchRoles = async () => {
+  const fetchCurrency = async () => {
     try {
-      const response = await axios.get("/roles");
+      const response = await axios.get("/currency");
 
-      setFetchRoles(response.data.data);
+      setFetchCurrency(response.data.data);
       return response.data.data;
     } catch (error) {
-      console.error("Failed to fetch roles", error);
+      console.error("Failed to fetch currency", error);
       return [];
     }
   };
 
-  const fetchUserTypes = async () => {
+  const fetchCategory = async () => {
     try {
-      const response = await axios.get("/user-type");
+      const response = await axios.get("/category");
       // console.log("User Type: " + response.data.data);
-      setFetchUserTypes(response.data.data);
+      setFetchCategory(response.data.data);
       return response.data.data;
     } catch (error) {
-      console.error("Failed to fetch user types", error);
+      console.error("Failed to fetch category", error);
       return [];
     }
   };
@@ -246,7 +276,15 @@ const Fleet = () => {
   const fetchSellers = async () => {
     try {
       const response = await axios.get("/sellers");
-      setFetchSellers(response.data.data);
+
+      const sellersOptions = response.data.data.map((seller) => ({
+        value: seller.seller_id,
+        label: seller.seller_commercial_name,
+      }));
+
+      // Set the state with the options
+      setFetchSellers(sellersOptions);
+
       return response.data.data;
     } catch (error) {
       console.error("Failed to fetch sellers", error);
@@ -259,22 +297,22 @@ const Fleet = () => {
       try {
         setError(false);
 
-        // Fetch roles, user types, and sellers
-        const [role, user_type, seller, userData] = await Promise.all([
-          fetchRoles(),
-          fetchUserTypes(),
+        // Fetch currencys, user types, and sellers
+        const [currency, category, seller, fleetData] = await Promise.all([
+          fetchCurrency(),
+          fetchCategory(),
           fetchSellers(),
-          axios.get("/user"),
+          axios.get("/fleet"),
         ]);
 
-        setRowData(userData.data.data);
-        // console.log("UserData=========> " + JSON.stringify(userData.data.data));
+        setRowData(fleetData.data.data);
+        // console.log("UserData=========> " + JSON.stringify(fleetData.data.data));
 
-        // Update form data with fetched roles, user types, and sellers
+        // Update form data with fetched currencys, user types, and sellers
         setFormData((prevFormData) => ({
           ...prevFormData,
-          role,
-          user_type,
+          currency,
+          category,
           seller,
         }));
 
@@ -282,35 +320,48 @@ const Fleet = () => {
         // console.log("Form Data " + JSON.stringify(formData));
       } catch (error) {
         setError(true);
-        toast.error("Failed to fetch user data");
+        toast.error("Failed to fetch fleet data");
       }
     };
 
     fetchData();
   }, []);
 
-  const fetchUserDetails = async (userId) => {
+  const fetchFleetDetails = async (fleetId) => {
     try {
-      const response = await axios.get(`/user/${userId}`);
+      const response = await axios.get(`/fleet/${fleetId}`);
 
       if (response.status === 200) {
-        const userDetails = response.data.data;
+        const fleetDetails = response.data.data;
 
-        console.log(userDetails);
+        console.log(fleetDetails);
+
+        setSelectedSellerDDL({
+          value: fleetDetails.seller.seller_id,
+          label: fleetDetails.seller.seller_commercial_name,
+        });
+
+        console.log(selectedSellerDDL);
 
         // Set form fields with user details
         setFormData({
-          firstname: userDetails.firstname,
-          lastname: userDetails.lastname,
-          email: userDetails.email,
-          password: userDetails.password,
-          profile_pic: userDetails.profile_pic,
-          enable: userDetails.enable,
-          role: userDetails.role ? userDetails.role.role_id : null,
-          user_type: userDetails.user_type
-            ? userDetails.user_type.login_user_type_id
+          tail_number: fleetDetails.tail_number,
+          model: fleetDetails.model,
+          hour_price: fleetDetails.hour_price,
+          knots_speed: fleetDetails.knots_speed,
+          max_range_nm: fleetDetails.max_range_nm,
+          pax_number: fleetDetails.pax_number,
+          brand: fleetDetails.brand,
+          photo_interior: fleetDetails.photo_interior,
+          photo_exterior: fleetDetails.photo_exterior,
+          yom: fleetDetails.yom,
+          currency: fleetDetails.currency
+            ? fleetDetails.currency.currency_Id
             : null,
-          seller: userDetails.seller ? userDetails.seller.seller_id : null,
+          category: fleetDetails.category
+            ? fleetDetails.category.category_id
+            : null,
+          seller: fleetDetails.seller ? fleetDetails.seller.seller_id : null,
         });
       } else {
         toast.error("Failed to fetch user details");
@@ -335,11 +386,14 @@ const Fleet = () => {
     // Convert 'enable' field to a number
     const formDataWithNumber = {
       ...formData,
-      enable: parseInt(formData.enable, 10),
+      yom: parseInt(formData.yom, 10),
+      knots_speed: parseInt(formData.knots_speed, 10),
+      max_range_nm: parseInt(formData.max_range_nm, 10),
+      pax_number: parseInt(formData.pax_number, 10),
     };
 
-    console.log("Form Data after submitting " + formDataWithNumber);
-    const url = isEdit ? `/user/${editeduserId}` : "/user";
+    // console.log("Form Data after submitting " + formDataWithNumber);
+    const url = isEdit ? `/fleet/${editedfleetId}` : "/fleet";
     console.log("formData====>", formData);
     axios
       .request({
@@ -351,7 +405,7 @@ const Fleet = () => {
         console.log("Add API-------> " + result);
         if (result) {
           toast.success(isEdit ? "Updated Successfully" : "Added Successfully");
-          const getResponse = await axios.get("/user");
+          const getResponse = await axios.get("/fleet");
           setRowData(getResponse.data.data);
 
           // Scroll to the top of the page
@@ -363,35 +417,78 @@ const Fleet = () => {
       })
       .catch((err) => {
         console.log(err);
-        toast.error(isEdit ? "Failed to update User" : "Failed to add User");
+        toast.error(isEdit ? "Failed to update Fleet" : "Failed to add Fleet");
       });
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    console.log("e.target.value====>", e);
 
+    if (e === null || e === undefined) {
+      setSelectedSellerDDL({ value: -1, label: "Select Seller" });
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        seller: null,
+      }));
+      return;
+    }
+    let name = null;
+    let value = null;
+    if (e.hasOwnProperty("label")) {
+      name = "seller";
+      value = e.value;
+      setSelectedSellerDDL({ value: value, label: e.label });
+    } else {
+      name = e.target.name;
+      value = e.target.value;
+    }
     console.log("we are in Handle change for " + name + " : " + value);
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: value,
     }));
+
+    console.log("selectedSellerDDL===>", selectedSellerDDL);
+  };
+
+  const handleYearChange = (date) => {
+    if (date !== null) {
+      const year = date.getFullYear();
+      setSelectedYear(year);
+
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        yom: year.toString(),
+      }));
+    } else {
+      let valid = true;
+      const errors = {};
+      errors.yom = "Year of Manufacture is required";
+      valid = false;
+      setFormErrors(errors);
+      return valid;
+    }
   };
 
   const resetForm = () => {
     setIsEdit(false);
-    setEditeduserId(null);
+    setEditedfleetId(null);
     setIsViewModalOpen(false);
-    setSelectedUserDetails(null);
+    setSelectedFleetDetails(null);
     setFormData({
-      firstname: "",
-      lastname: "",
-      email: "",
-      password: "",
-      profile_pic: "",
-      role: null, // Selected role
-      user_type: null, // Selected user type
+      tail_number: "",
+      model: "",
+      hour_price: "",
+      knots_speed: "",
+      max_range_nm: "",
+      paxnumber: "",
+      photo_interior: "",
+      photo_exterior: "",
+      brand: "",
+      yom: "",
+      currency: null, // Selected currency
+      category: null, // Selected user type
       seller: null, // Selected seller
-      enable: 0,
     });
     setFormErrors({});
   };
@@ -402,21 +499,24 @@ const Fleet = () => {
 
   const handleCloseViewModal = () => {
     setIsViewModalOpen(false);
-    setSelectedUserDetails(null);
+    setSelectedFleetDetails(null);
   };
 
   const labelsMapping = {
-    login_user_id: "User Id",
-    firstname: "User First Name",
-    lastname: "User Last Name",
-    email: "Email",
-    password: "Password",
-    profile_pic: "Profile Pic",
+    fleet_id: "Fleet Id",
+    tail_number: "Tail Number",
+    model: "Model",
+    hour_price: "Hour Price",
+    knots_speed: "Knots Speed",
+    pax_number: "Pax Number",
+    brand: "Brand",
+    photo_interior: "Photo Interior",
+    photo_exterior: "Photo Exterior",
+    yom: "Year of Manufacture",
     date_time_insert: "Inserted Date",
-    enable: "Enable",
-    role: "Role",
-    // role.role_name: "Role Name",
-    user_type: "User Type",
+    currency: "Currency",
+    // currency.currency_name: "Role Name",
+    category: "Category",
     seller: "Seller",
   };
 
@@ -433,182 +533,232 @@ const Fleet = () => {
           <div className="col-md-5">
             <Card className="shadow">
               <CardHeader className="bg-transparent">
-                <h3 className="mb-0">{isEdit ? "Edit User" : "Add User"}</h3>
+                <h3 className="mb-0">{isEdit ? "Edit Fleet" : "Add Fleet"}</h3>
               </CardHeader>
               <CardBody>
-                <Form role="form">
+                <Form currency="form">
                   <FormGroup>
-                    <Label for="firstname">User First Name</Label>
+                    <Label for="tail_number">Tail Number</Label>
                     <InputGroup className="input-group-alternative mb-3">
                       <Input
-                        id="firstname"
-                        name="firstname"
-                        value={formData.firstname}
-                        placeholder="User First Name"
+                        id="tail_number"
+                        name="tail_number"
+                        value={formData.tail_number}
+                        placeholder="Tail Number"
                         type="text"
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.firstname && (
+                    {formErrors.tail_number && (
                       <small className="text-danger">
-                        {formErrors.firstname}
+                        {formErrors.tail_number}
                       </small>
                     )}
                   </FormGroup>
                   <FormGroup>
-                    <Label for="lastname">User Last Name</Label>
+                    <Label for="model">Model</Label>
                     <InputGroup className="input-group-alternative mb-3">
                       <Input
-                        id="lastname"
-                        name="lastname"
-                        value={formData.lastname}
-                        placeholder="User Last Name"
+                        id="model"
+                        name="model"
+                        value={formData.model}
+                        placeholder="Model"
                         type="text"
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.lastname && (
+                    {formErrors.model && (
+                      <small className="text-danger">{formErrors.model}</small>
+                    )}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="hour_price">Hour Price</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="hour_price"
+                        name="hour_price"
+                        value={formData.hour_price}
+                        placeholder="Hour Price"
+                        type="text"
+                        onChange={handleChange}
+                      />
+                    </InputGroup>
+                    {formErrors.hour_price && (
                       <small className="text-danger">
-                        {formErrors.lastname}
+                        {formErrors.hour_price}
                       </small>
                     )}
                   </FormGroup>
                   <FormGroup>
-                    <Label for="email">Email</Label>
-                    <InputGroup className="input-group-alternative mb-3">
-                      <Input
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        placeholder="Email"
-                        type="text"
-                        onChange={handleChange}
-                      />
-                    </InputGroup>
-                    {formErrors.email && (
-                      <small className="text-danger">{formErrors.email}</small>
-                    )}
-                  </FormGroup>
-                  <FormGroup>
-                    <Label for="password">Password</Label>
+                    <Label for="knots_speed">Knots Speed</Label>
                     <InputGroup className="input-group-alternative mb-3">
                       <Input
                         id="id_number"
-                        name="password"
-                        value={formData.password}
-                        placeholder="Password"
-                        type="password"
+                        name="knots_speed"
+                        value={formData.knots_speed}
+                        placeholder="Knots Speed"
+                        type="number"
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.password && (
+                    {formErrors.knots_speed && (
                       <small className="text-danger">
-                        {formErrors.password}
+                        {formErrors.knots_speed}
                       </small>
                     )}
                   </FormGroup>
                   <FormGroup>
-                    <Label for="profilepic">Profile Pic</Label>
+                    <Label for="max_range_nm">Max Range</Label>
                     <InputGroup className="input-group-alternative mb-3">
                       <Input
-                        id="profilepic"
-                        name="profile_pic"
-                        value={formData.profile_pic}
-                        placeholder="Profile Pic"
+                        id="max_range_nm"
+                        name="max_range_nm"
+                        value={formData.max_range_nm}
+                        placeholder="Max Range"
+                        type="number"
+                        onChange={handleChange}
+                      />
+                    </InputGroup>
+                    {formErrors.max_range_nm && (
+                      <small className="text-danger">
+                        {formErrors.max_range_nm}
+                      </small>
+                    )}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="pax_number">Pax Number</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="pax_number"
+                        name="pax_number"
+                        value={formData.pax_number}
+                        placeholder="Pax Number"
+                        type="number"
+                        onChange={handleChange}
+                      />
+                    </InputGroup>
+                    {formErrors.pax_number && (
+                      <small className="text-danger">
+                        {formErrors.pax_number}
+                      </small>
+                    )}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="brand">Brand</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="brand"
+                        name="brand"
+                        value={formData.brand}
+                        placeholder="Brand"
                         type="text"
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.profile_pic && (
-                      <small className="text-danger">
-                        {formErrors.profile_pic}
-                      </small>
+                    {formErrors.brand && (
+                      <small className="text-danger">{formErrors.brand}</small>
                     )}
                   </FormGroup>
-                  {/* <FormGroup>
-                    <Label for="enable">Enable</Label>
-                    <InputGroup className="input-group-alternative">
+                  <FormGroup>
+                    <Label for="photo_interior">Photo Interior</Label>
+                    <InputGroup className="input-group-alternative mb-3">
                       <Input
-                        id="enable"
-                        name="enable"
-                        placeholder="enable"
-                        type="number"
-                        value={formData.enable}
+                        id="photo_interior"
+                        name="photo_interior"
+                        value={formData.photo_interior}
+                        placeholder="Photo Interior"
+                        type="text"
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.enable && (
-                      <small className="text-danger">{formErrors.enable}</small>
+                    {formErrors.photo_interior && (
+                      <small className="text-danger">
+                        {formErrors.photo_interior}
+                      </small>
                     )}
-                  </FormGroup> */}
+                  </FormGroup>
                   <FormGroup>
-                    <Label for="enable">Enable</Label>
-                    <CustomInput
-                      type="switch"
-                      id="enable"
-                      name="enable"
-                      onChange={(e) =>
-                        handleChange({
-                          target: {
-                            name: "enable",
-                            value: e.target.checked ? 1 : 0,
-                          },
-                        })
-                      }
-                      checked={formData.enable === 1}
-                      label={formData.enable === 1 ? "Enabled" : "Disabled"}
-                    />
-                    {formErrors.enable && (
-                      <small className="text-danger">{formErrors.enable}</small>
+                    <Label for="photo_exterior">Photo Exterior</Label>
+                    <InputGroup className="input-group-alternative mb-3">
+                      <Input
+                        id="photo_exterior"
+                        name="photo_exterior"
+                        value={formData.photo_exterior}
+                        placeholder="Photo Exterior"
+                        type="text"
+                        onChange={handleChange}
+                      />
+                    </InputGroup>
+                    {formErrors.photo_exterior && (
+                      <small className="text-danger">
+                        {formErrors.photo_exterior}
+                      </small>
                     )}
+                  </FormGroup>
+                  <FormGroup>
+                    <Label for="yom">Year Of Manufacture</Label>
+                    <Row>
+                      <Col>
+                        <YearPicker
+                          selected={selectedYear}
+                          onChange={handleYearChange}
+                          value={formData.yom}
+                        />
+                      </Col>
+                    </Row>
                   </FormGroup>
 
                   <FormGroup>
-                    <Label for="role">Role</Label>
+                    <Label for="currency">Currency</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      {fetchrole && fetchrole.length > 0 ? (
+                      {fetchcurrency && fetchcurrency.length > 0 ? (
                         <Input
                           type="select"
-                          name="role"
-                          id="role"
+                          name="currency"
+                          id="currency"
                           onChange={handleChange}
-                          value={formData.role || ""}
+                          value={formData.currency || ""}
                         >
                           <option key="" value="">
-                            Select Role
+                            Select Currency
                           </option>
-                          {fetchrole.map((role) => (
-                            <option key={role.role_id} value={role.role_id}>
-                              {role.role_name}
+                          {fetchcurrency.map((currency) => (
+                            <option
+                              key={currency.currency_Id}
+                              value={currency.currency_Id}
+                            >
+                              {currency.currency_name}
                             </option>
                           ))}
                         </Input>
                       ) : (
-                        <div>No roles available</div>
+                        <div>No currencys available</div>
                       )}
                     </InputGroup>
-                    {formErrors.role && (
-                      <small className="text-danger">{formErrors.role}</small>
+                    {formErrors.currency && (
+                      <small className="text-danger">
+                        {formErrors.currency}
+                      </small>
                     )}
                   </FormGroup>
                   <FormGroup>
-                    <Label for="user_type">User Type</Label>
+                    <Label for="category">Category</Label>
                     <InputGroup className="input-group-alternative mb-3">
-                      {fetchusertypes && fetchusertypes.length > 0 ? (
+                      {fetchcategory && fetchcategory.length > 0 ? (
                         <Input
                           type="select"
-                          name="user_type"
-                          id="user_type"
+                          name="category"
+                          id="category"
                           onChange={handleChange}
-                          // value={formData.user_type || ""}
+                          value={formData.category || ""}
                         >
-                          <option value="">Select User Type</option>
-                          {fetchusertypes.map((userType) => (
+                          <option value="">Select Category</option>
+                          {fetchcategory.map((category) => (
                             <option
-                              key={userType.login_user_type_id}
-                              value={userType.login_user_type_id}
+                              key={category.category_id}
+                              value={category.category_id}
                             >
-                              {userType.user_type}
+                              {category.category_name}
                             </option>
                           ))}
                         </Input>
@@ -616,9 +766,9 @@ const Fleet = () => {
                         <div>No user types available</div>
                       )}
                     </InputGroup>
-                    {formErrors.user_type && (
+                    {formErrors.category && (
                       <small className="text-danger">
-                        {formErrors.user_type}
+                        {formErrors.category}
                       </small>
                     )}
                   </FormGroup>
@@ -628,21 +778,51 @@ const Fleet = () => {
                     <Label for="seller">Seller</Label>
                     {fetchsellers && fetchsellers.length > 0 ? (
                       <Select
+                        className="basic-single"
+                        classNamePrefix="select"
+                        isClearable={true}
+                        isSearchable={true}
+                        name="ddlSeller"
+                        value={fetchsellers.find(
+                          (obj) => obj.value === selectedSellerDDL.value
+                        )}
+                        onChange={handleChange}
+                        options={fetchsellers}
+                      />
+                    ) : (
+                      <div>No sellers available</div>
+                    )}
+                    {formErrors.seller && (
+                      <small className="text-danger">{formErrors.seller}</small>
+                    )}
+
+                    {/* {fetchsellers && fetchsellers.length > 0 ? (
+                      <Select
+                        // value={formData.seller || ""}
+                        onChange={handleChange}
                         options={fetchsellers.map((seller) => ({
                           value: seller.seller_id.toString(),
                           label: seller.seller_commercial_name,
                         }))}
-                        value={fetchsellers.find(
-                          (seller) => seller.seller_id === formData.seller
-                        )}
-                        onChange={(selectedOption) => {
-                          setFormData((prevFormData) => ({
-                            ...prevFormData,
-                            seller: selectedOption
-                              ? selectedOption.value
-                              : null,
-                          }));
-                        }}
+                        value={
+                          formData.seller
+                            ? {
+                                value: formData.seller, // Convert to string if necessary
+                                label:
+                                  fetchsellers.find((s) => s.seller_id === formData.seller)
+                                    ?.seller_commercial_name || '',
+                              }
+                            : null
+                        }
+                        // onChange={(selectedOption) => {
+                        //   setFormData((prevFormData) => ({
+                        //     ...prevFormData,
+                        //     seller: selectedOption
+                        //       ? selectedOption.value
+                        //       : null,
+                        //   }));
+                        // }}
+
                         isClearable={true}
                         isSearchable={true}
                       />
@@ -651,7 +831,7 @@ const Fleet = () => {
                     )}
                     {formErrors.seller && (
                       <small className="text-danger">{formErrors.seller}</small>
-                    )}
+                    )} */}
                   </FormGroup>
 
                   <div className="text-center">
@@ -662,7 +842,7 @@ const Fleet = () => {
                       onClick={() => {
                         resetForm();
                         setIsEdit(false); // Reset edit mode
-                        setEditeduserId(null); // Reset edited user ID
+                        setEditedfleetId(null); // Reset edited user ID
                         // Clear the seller value in formData
                         setFormData((prevFormData) => ({
                           ...prevFormData,
@@ -694,7 +874,7 @@ const Fleet = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
-                idKey="login_user_id" // or "user_id" depending on your use case
+                idKey="fleet_id" // or "user_id" depending on your use case
               />
             </div>
           </div>
@@ -705,7 +885,7 @@ const Fleet = () => {
       <ViewModal
         isOpen={isViewModalOpen}
         onClose={handleCloseViewModal}
-        data={selectedUserDetails}
+        data={selectedFleetDetails}
         labelsMapping={labelsMapping}
       />
     </>

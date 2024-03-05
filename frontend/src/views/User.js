@@ -412,6 +412,7 @@ const User = () => {
 
   const resetForm = () => {
     setIsEdit(false);
+    setSelectedSellerDDL({ value: null, label: null });
     setEditeduserId(null);
     setIsViewModalOpen(false);
     setSelectedUserDetails(null);
@@ -659,19 +660,25 @@ const User = () => {
                   {/* Seller dropdown */}
                   <FormGroup>
                     <Label for="seller">Seller</Label>
-
-                    <Select
-                      className="basic-single"
-                      classNamePrefix="select"
-                      isClearable={true}
-                      isSearchable={true}
-                      name="ddlSeller"
-                      value={fetchsellers.find(
-                        (obj) => obj.value === selectedSellerDDL.value
-                      )}
-                      onChange={handleChange}
-                      options={fetchsellers}
-                    />
+                    {fetchsellers && fetchsellers.length > 0 ? (
+                      <Select
+                        className="basic-single"
+                        classNamePrefix="select"
+                        isClearable={true}
+                        isSearchable={true}
+                        name="ddlSeller"
+                        value={fetchsellers.find(
+                          (obj) => obj.value === selectedSellerDDL.value
+                        )}
+                        onChange={handleChange}
+                        options={fetchsellers}
+                      />
+                    ) : (
+                      <div>No sellers available</div>
+                    )}
+                    {formErrors.seller && (
+                      <small className="text-danger">{formErrors.seller}</small>
+                    )}
 
                     {/* {fetchsellers && fetchsellers.length > 0 ? (
                       <Select

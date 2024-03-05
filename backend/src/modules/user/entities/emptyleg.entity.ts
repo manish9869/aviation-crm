@@ -12,7 +12,7 @@ import { Currency } from './currency.entity';
 import { Fleet } from './fleet.entity';
 
 @Entity({ name: 'empty_leg' })
-export class EmptyLeg {
+export class Emptyleg {
   @PrimaryGeneratedColumn()
   empty_leg_id: number;
 
@@ -32,13 +32,13 @@ export class EmptyLeg {
   initial_date: Date;
 
   @Column({ nullable: false })
-  initial_time: Date;
+  initial_time: String;
 
   @Column({ nullable: false })
   departure_date: Date;
 
   @Column({ nullable: false })
-  departure_time: Date;
+  departure_time: String;
 
   @Column({ nullable: false })
   numpax: number;
