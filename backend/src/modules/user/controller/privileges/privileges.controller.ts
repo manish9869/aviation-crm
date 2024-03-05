@@ -18,7 +18,13 @@ export class PrivilegesController {
   async create(
     @Body() privilegesData: Partial<Privileges>,
   ): Promise<Privileges> {
-    return await this.privilegesService.create(privilegesData);
+    return await this.privilegesService.createOrUpdate(privilegesData);
+  }
+
+  @Get('/role/:id')
+  async findPrivilegesByRole(@Param('id') id: number): Promise<Privileges> {
+    console.log('roleId', id);
+    return await this.privilegesService.findPrivilegesByRole(id);
   }
 
   @Get()

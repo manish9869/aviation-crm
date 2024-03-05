@@ -10,12 +10,40 @@ export class PrivilegesService {
     private readonly privilegesRepository: Repository<Privileges>,
   ) {}
 
-  async create(privileges: Partial<Privileges>): Promise<Privileges> {
-    return await this.privilegesRepository.save(privileges);
+  async createOrUpdate(privileges: Partial<Privileges>): Promise<Privileges> {
+    if (privileges.privilege_id) {
+      // If privileges object has an id, it's an update operation
+      const existingPrivilege = await this.privilegesRepository.findOne({
+        where: { privilege_id: privileges.privilege_id },
+      });
+      if (!existingPrivilege) {
+        throw new Error(
+          `Privilege with id ${privileges.privilege_id} not found.`,
+        );
+      }
+
+      // Update existing privilege with the provided data
+      const updatedPrivilege = await this.privilegesRepository.save({
+        ...existingPrivilege,
+        ...privileges,
+      });
+
+      return updatedPrivilege;
+    } else {
+      // If no id is provided, it's an add operation
+      return await this.privilegesRepository.save(privileges);
+    }
   }
 
   async findAll(): Promise<Privileges[]> {
     return await this.privilegesRepository.find();
+  }
+
+  async findPrivilegesByRole(id): Promise<Privileges> {
+    id = parseInt(id);
+    return await this.privilegesRepository.findOne({
+      where: { role: id },
+    });
   }
 
   async findOne(id: number): Promise<Privileges> {
