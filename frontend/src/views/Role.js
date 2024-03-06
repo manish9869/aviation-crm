@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import CommonHeader from "components/Headers/CommonHeader";
-import Grid from "components/ag-grid/Grid";
+import CommonHeader from "../components/Headers/CommonHeader";
+import Grid from "../components/Ag-grid/Grid";
 import {
   Card,
   CardHeader,
@@ -158,7 +158,9 @@ const Role = () => {
       const method = isEdit ? "put" : "post";
       const response = await axios[method](url, formData);
       if (response.status === 200 || response.status === 201) {
-        toast.success(isEdit ? "Role updated successfully" : "Role added successfully");
+        toast.success(
+          isEdit ? "Role updated successfully" : "Role added successfully"
+        );
         const updatedResponse = await fetchRoles();
         setRowData(updatedResponse.data.data);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -200,7 +202,7 @@ const Role = () => {
           <Col md={5}>
             <Card className="shadow">
               <CardHeader className="bg-transparent">
-                <h3 className="mb-0">{isEdit ? 'Update' : 'Add'} Role</h3>
+                <h3 className="mb-0">{isEdit ? "Update" : "Add"} Role</h3>
               </CardHeader>
               <CardBody>
                 <Form role="form" onSubmit={handleSubmit}>
@@ -219,7 +221,11 @@ const Role = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.role_name && <span className="text-danger">{formErrors.role_name}</span>}
+                    {formErrors.role_name && (
+                      <span className="text-danger">
+                        {formErrors.role_name}
+                      </span>
+                    )}
                   </FormGroup>
                   <FormGroup>
                     <InputGroup className="input-group-alternative mb-3">
@@ -236,11 +242,24 @@ const Role = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.role_description && <span className="text-danger">{formErrors.role_description}</span>}
+                    {formErrors.role_description && (
+                      <span className="text-danger">
+                        {formErrors.role_description}
+                      </span>
+                    )}
                   </FormGroup>
                   <div className="text-center">
-                    <Button className="mr-2" color="danger" type="button" onClick={resetForm}>Clear</Button>
-                    <Button className="mr-2" color="primary" type="submit">{isEdit ? 'Update' : 'Submit'}</Button>
+                    <Button
+                      className="mr-2"
+                      color="danger"
+                      type="button"
+                      onClick={resetForm}
+                    >
+                      Clear
+                    </Button>
+                    <Button className="mr-2" color="primary" type="submit">
+                      {isEdit ? "Update" : "Submit"}
+                    </Button>
                   </div>
                 </Form>
               </CardBody>

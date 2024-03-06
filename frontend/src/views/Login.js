@@ -15,7 +15,7 @@ import {
 } from "reactstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "./../components/auth/AuthContext";
+import { AuthContext } from "../components/Auth/AuthContext";
 const Login = () => {
   const { setUserData } = useContext(AuthContext);
   const [email, setEmail] = useState();

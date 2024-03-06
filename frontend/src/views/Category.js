@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import CommonHeader from "components/Headers/CommonHeader";
-import Grid from "components/ag-grid/Grid";
+import CommonHeader from "../components/Headers/CommonHeader";
+import Grid from "../components/Ag-grid/Grid";
 import {
   Card,
   CardHeader,
@@ -143,7 +143,11 @@ const Category = () => {
       const method = isEdit ? "put" : "post";
       const response = await axios[method](url, formData);
       if (response.status === 200 || response.status === 201) {
-        toast.success(isEdit ? "Category updated successfully" : "Category added successfully");
+        toast.success(
+          isEdit
+            ? "Category updated successfully"
+            : "Category added successfully"
+        );
         const updatedResponse = await fetchCategories();
         setRowData(updatedResponse.data.data);
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -184,7 +188,9 @@ const Category = () => {
           <Col md={5}>
             <Card className="shadow">
               <CardHeader className="bg-transparent">
-                <h3 className="mb-0">{isEdit ? 'Edit Category' : 'Add Category'}</h3>
+                <h3 className="mb-0">
+                  {isEdit ? "Edit Category" : "Add Category"}
+                </h3>
               </CardHeader>
               <CardBody>
                 <Form role="form" onSubmit={handleSubmit}>
@@ -203,12 +209,23 @@ const Category = () => {
                         onChange={handleChange}
                       />
                     </InputGroup>
-                    {formErrors.category_name && <span className="text-danger">{formErrors.category_name}</span>}
+                    {formErrors.category_name && (
+                      <span className="text-danger">
+                        {formErrors.category_name}
+                      </span>
+                    )}
                   </FormGroup>
                   <div className="text-center">
-                    <Button className="mr-2" color="danger" type="button" onClick={resetForm}>Clear</Button>
+                    <Button
+                      className="mr-2"
+                      color="danger"
+                      type="button"
+                      onClick={resetForm}
+                    >
+                      Clear
+                    </Button>
                     <Button className="mr-2" color="primary" type="submit">
-                      {isEdit ? 'Update' : 'Submit'}
+                      {isEdit ? "Update" : "Submit"}
                     </Button>
                   </div>
                 </Form>
@@ -223,7 +240,7 @@ const Category = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
-                idKey="category_id" 
+                idKey="category_id"
               />
             </div>
           </Col>

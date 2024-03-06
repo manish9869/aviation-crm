@@ -15,7 +15,7 @@ import {
   CustomInput,
 } from "reactstrap";
 import Select from "react-select";
-import Grid from "./../components/ag-grid/Grid";
+import Grid from "../components/Ag-grid/Grid";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
