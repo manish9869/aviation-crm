@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
-
+import Login from "views/Login";
 // core components
 // import AuthNavbar from "components/Navbars/AuthNavbar.js";
 // import AuthFooter from "components/Footers/AuthFooter.js";
@@ -13,6 +13,7 @@ const Auth = (props) => {
   const mainContent = React.useRef(null);
   const location = useLocation();
 
+  console.log("location", location);
   React.useEffect(() => {
     document.body.classList.add("bg-default");
     return () => {
@@ -26,50 +27,40 @@ const Auth = (props) => {
   }, [location]);
 
   const getRoutes = (routes) => {
-    return routes.reduce((acc, prop, key) => {
-      if (prop.layout === "/auth") {
-        acc.push(
-          <Route path={prop.path} element={prop.component} key={key} exact />
-        );
-      }
-      if (prop.sub_menu && prop.sub_menu.length > 0) {
-        prop.sub_menu.forEach((subItem, subKey) => {
-          if (subItem.layout === "/auth") {
-            acc.push(
-              <Route
-                path={subItem.path}
-                element={subItem.component}
-                key={`${key}-${subKey}`}
-                exact
-              />
-            );
-          }
-        });
-      }
-      return acc;
-    }, []);
+    console.log("  routes", location);
+
+    if (location.pathname == "/auth/login") {
+      return <Route path="/login" element={<Login />} />;
+    }
+
+    // return routes.reduce((acc, prop, key) => {
+    //   if (prop.layout === "/auth") {
+    //     acc.push(
+    //       <Route path={prop.path} element={prop.component} key={key} exact />
+    //     );
+    //   }
+    //   if (prop.sub_menu && prop.sub_menu.length > 0) {
+    //     prop.sub_menu.forEach((subItem, subKey) => {
+    //       if (subItem.layout === "/auth") {
+    //         acc.push(
+    //           <Route
+    //             path={subItem.path}
+    //             element={subItem.component}
+    //             key={`${key}-${subKey}`}
+    //             exact
+    //           />
+    //         );
+    //       }
+    //     });
+    //   }
+    //   return acc;
+    // }, []);
   };
 
-
-  /* <Container>
-           <div className="header-body text-center mb-7">
-              <Row className="justify-content-center">
-                <Col lg="5" md="6">
-                  <h1 className="text-white">Welcome!</h1>
-                  <p className="text-lead text-light">
-                   Use these awesome forms to login or create new account in
-                    your project for free.
-                  </p>
-                </Col>
-              </Row>
-            </div>
-          </Container>*/
-          
   return (
     <>
       <div className="main-content" ref={mainContent}>
         <div className="header bg-gradient-info py-7 py-lg-8">
-          
           <div className="separator separator-bottom separator-skew zindex-100">
             <svg
               xmlns="http://www.w3.org/2000/svg"

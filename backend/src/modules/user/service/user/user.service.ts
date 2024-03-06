@@ -27,9 +27,19 @@ export class UserService {
   }
 
   async findByEmail(mail: string): Promise<User> {
-    return await this.userRepository.findOne({
-      where: { email: mail },
-    });
+    return await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
+      .leftJoinAndMapMany(
+        'role.privileges',
+        'Privileges',
+        'privileges',
+        'privileges.role_id = role.role_id',
+      )
+      .leftJoinAndSelect('user.user_type', 'user_type') // Add relation for user_type
+      .leftJoinAndSelect('user.seller', 'seller') // Add relation for seller
+      .where('user.email = :email', { email: mail })
+      .getOne();
   }
 
   async update(id: number, userDto: UserDto): Promise<User> {

@@ -8,10 +8,12 @@ import {
   Delete,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { UserDto } from '../../dto/user.dto';
 import { User } from '../../entities/user.entity';
 import { UserService } from '../../service/user/user.service';
+import { AuthGuard } from 'src/modules/auth/auth.guard';
 
 @Controller('user')
 export class UserController {
@@ -29,6 +31,7 @@ export class UserController {
     }
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   async findAll(): Promise<User[]> {
     try {

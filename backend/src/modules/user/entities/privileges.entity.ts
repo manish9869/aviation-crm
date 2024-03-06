@@ -13,7 +13,7 @@ export class Privileges {
   privilege_id: number;
 
   @Column({ type: 'json', nullable: false })
-  privileges: any; // Array of objects containing path, access_config, and route_name
+  privileges: any;
 
   @ManyToOne(() => Roles, { eager: true })
   @JoinColumn({ name: 'role_id' })

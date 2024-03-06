@@ -13,8 +13,10 @@ export class AuthService {
     username: string,
     pass: string,
   ): Promise<{ access_token: string }> {
+    console.log('username', username);
     const user = await this.usersService.findByEmail(username);
 
+    console.log('user===>', user);
     // console.log('=========> ' + user.email);
     if (!user || !user.email) {
       throw new Error('Email not available');
@@ -22,10 +24,10 @@ export class AuthService {
 
     console.log(pass, username);
 
-    console.log("-------Password------" +pass +" , " + user.password);
+    console.log('-------Password------' + pass + ' , ' + user.password);
     if (user.password !== pass) {
       throw new Error('Password not correct');
-        }
+    }
     const payload = { ...user };
     return {
       ...user,
