@@ -1,5 +1,3 @@
-// axiosInstance.js
-
 import axios from "axios";
 
 // Create an instance of axios
