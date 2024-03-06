@@ -37,6 +37,7 @@ import {
 } from "reactstrap";
 
 const Sidebar = (props) => {
+  const userDataProp = props.userData;
   const [collapseOpen, setCollapseOpen] = useState(false);
   const [accordionStates, setAccordionStates] = useState(
     Array(props.routes.length).fill(false)
@@ -56,9 +57,35 @@ const Sidebar = (props) => {
     setCollapseOpen(false);
   };
 
-  const createLinks = (routes) => {
+  const createLinks = (routes, userData) => {
+    const hasReadAccess = (path) => {
+      if (
+        !userData ||
+        !userData.role ||
+        !userData.role.privileges[0].privileges
+      )
+        return false; // No privileges available
+
+      const privileges = userData.role.privileges[0].privileges;
+
+      for (let i = 0; i < privileges.length; i++) {
+        const privilege = privileges[i];
+        if ("/" + privilege.path === path && privilege.access_config.read) {
+          return true;
+        }
+      }
+      return false;
+    };
+
     return routes.map((route, index) => {
       if (route.sub_menu && route.sub_menu.length > 0) {
+        // Filter out submenu items based on read access
+        const subMenuItems = route.sub_menu.filter((subItem) =>
+          hasReadAccess(subItem.path)
+        );
+
+        if (subMenuItems.length === 0) return null; // No accessible submenu items
+
         // Check if any submenu item is active
         const isSubmenuActive = route.sub_menu.some((subItem) =>
           window.location.pathname.includes(subItem.layout + subItem.path)
@@ -84,7 +111,7 @@ const Sidebar = (props) => {
             </NavLink>
             <Collapse isOpen={accordionStates[index]}>
               <Nav>
-                {route.sub_menu.map((subItem, subIndex) => (
+                {subMenuItems.map((subItem, subIndex) => (
                   <NavItem key={subIndex}>
                     <NavLink
                       to={subItem.layout + subItem.path}
@@ -101,6 +128,8 @@ const Sidebar = (props) => {
           </NavItem>
         );
       } else {
+        if (!hasReadAccess(route.path)) return null; // No read access to the route
+
         return (
           <NavItem key={index}>
             <NavLink
@@ -117,7 +146,6 @@ const Sidebar = (props) => {
       }
     });
   };
-
   const { bgColor, routes, logo } = props;
   let navbarBrandProps;
   if (logo && logo.innerLink) {
@@ -260,7 +288,7 @@ const Sidebar = (props) => {
             </InputGroup>
           </Form>
           {/* Navigation */}
-          <Nav navbar>{createLinks(routes)}</Nav>
+          <Nav navbar>{createLinks(routes, userDataProp)}</Nav>
         </Collapse>
       </Container>
     </Navbar>

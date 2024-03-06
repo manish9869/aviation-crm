@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CommonHeader from "components/Headers/CommonHeader";
 import {
   Card,
@@ -11,28 +11,71 @@ import {
   Col,
   Button,
   Input,
-  InputGroupAddon,
-  InputGroupText,
   InputGroup,
   Table,
+  Label,
 } from "reactstrap";
+import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import routes from "./../routes"; // Import the routes array
 
 const Privilege = () => {
+  const [fetchrole, setFetchRoles] = useState([]);
+  const [selectedRole, setSelectedRole] = useState("");
+  const [formErrors, setFormErrors] = useState({
+    role: null, // Selected role
+  });
+
+  const [formData, setFormData] = useState({
+    role: null, // Selected role
+  });
+
+  useEffect(() => {
+    (async () => {
+      await fetchRoles();
+    })();
+  }, []);
+
+  // Initialize user privileges for all routes with all privileges set to false
+  const initialUserPrivileges = {};
+  routes.forEach((route) => {
+    initialUserPrivileges[route.path] = {
+      read: false,
+      write: false,
+      delete: false,
+    };
+  });
+
   // State to hold user privileges
-  const [userPrivileges, setUserPrivileges] = useState({});
+  const [userPrivileges, setUserPrivileges] = useState(initialUserPrivileges);
   // State to hold the selected user type
-  const [userType, setUserType] = useState("");
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get("/roles");
+
+      setFetchRoles(response.data.data);
+      return response.data.data;
+    } catch (error) {
+      console.error("Failed to fetch roles", error);
+      return [];
+    }
+  };
 
   // Function to handle privilege assignment
   const handlePrivilegeChange = (route, privilege, value) => {
     // Update user privileges based on the route and privilege
     const updatedPrivileges = { ...userPrivileges };
+    // Initialize the route path object if it doesn't exist
     if (!updatedPrivileges[route.path]) {
-      updatedPrivileges[route.path] = {};
+      updatedPrivileges[route.path] = {
+        read: false,
+        write: false,
+        delete: false,
+      };
     }
+    // Set the privilege to the provided value
     updatedPrivileges[route.path][privilege] = value;
     setUserPrivileges(updatedPrivileges);
   };
@@ -41,56 +84,105 @@ const Privilege = () => {
   const handleSelectAll = (privilege, checked) => {
     const updatedPrivileges = { ...userPrivileges };
     routes.forEach((route) => {
+      // Initialize the route path object if it doesn't exist
       if (!updatedPrivileges[route.path]) {
-        updatedPrivileges[route.path] = {};
+        updatedPrivileges[route.path] = {
+          read: false,
+          write: false,
+          delete: false,
+        };
       }
       updatedPrivileges[route.path][privilege] = checked;
     });
     setUserPrivileges(updatedPrivileges);
   };
 
-  // Function to handle user type selection
-  const handleUserTypeChange = (e) => {
-    setUserType(e.target.value);
+  const handleRoleChange = async (e) => {
+    setSelectedRole(e.target.value);
+    setFormErrors({ ...formErrors, role: "" });
+    setFormData({ ...formData, role: e.target.value });
+    await fetchRolePrivilleges(e.target.value);
   };
+
+  const fetchRolePrivilleges = async (roleId) => {
+    try {
+      const response = await axios.get("/privileges/role/" + roleId);
+
+      const privileges = response.data.data.privileges;
+      const privilegeId = response.data.data.privilege_id; // Assuming this is how you get the privilege_id
+
+      // Set privilege_id in formData
+      setFormData({ ...formData, privilege_id: privilegeId });
+      const updatedUserPrivileges = { ...userPrivileges };
+
+      // Iterate over the privileges obtained from the API response
+      privileges.forEach((privilege) => {
+        // Find the corresponding route in the userPrivileges state
+        const route = Object.keys(updatedUserPrivileges).find(
+          (path) => path.replace("/", "") === privilege.path
+        );
+
+        if (route) {
+          // Update the read, write, and delete privileges based on the API response
+          updatedUserPrivileges[route].read = privilege.access_config.read;
+          updatedUserPrivileges[route].write = privilege.access_config.write;
+          updatedUserPrivileges[route].delete = privilege.access_config.delete;
+        }
+      });
+      setUserPrivileges(updatedUserPrivileges);
+    } catch (error) {}
+  };
+
   // Function to handle form submission
   const handleSubmit = async () => {
-    if (!userType) {
-      // Display error message if user type is not selected
-      toast.error("Please select a user type.");
+    if (!selectedRole) {
+      setFormErrors({ ...formErrors, role: "Please select a role" });
       return;
     }
-
-    // Check if any privilege is selected
-    const hasPrivilege = Object.values(userPrivileges).some((privilege) =>
-      Object.values(privilege).some((value) => value === true)
-    );
-
-    // If no privilege is selected, set all privileges to false
-    if (!hasPrivilege) {
-      const updatedPrivileges = {};
-      routes.forEach((route) => {
-        updatedPrivileges[route.path] = {
-          read: false,
-          write: false,
-          delete: false,
-        };
+    const privilegeArray = [];
+    // Iterate over the userPrivileges object to construct the array
+    Object.keys(userPrivileges).forEach((path) => {
+      const accessConfig = userPrivileges[path];
+      const routeName = routes.find((route) => route.path === path)?.name || "";
+      privilegeArray.push({
+        path: path.replace("/", ""), // Remove the leading '/'
+        access_config: accessConfig,
+        route_name: routeName,
       });
-      setUserPrivileges(updatedPrivileges);
-    }
+    });
 
-    // Send the user privileges data to the API
+    // Send the array of privilege objects to the API
     try {
       // Make API call here to save user privileges for the selected user type
-      console.log("User Type:", userType);
-      console.log("User Privileges:", userPrivileges);
-      // Display success message
-      toast.success("Privileges assigned successfully!");
+      const isUpdate = formData.privilege_id !== undefined;
+
+      const requestBody = {
+        role: selectedRole,
+        privileges: privilegeArray,
+      };
+      if (isUpdate) {
+        requestBody.privilege_id = formData.privilege_id;
+      }
+
+      const response = await axios.post("/privileges", requestBody);
+
+      if (response) {
+        // Display success message
+        toast.success("Privileges assigned successfully!");
+      }
     } catch (error) {
       // Display error message if API call fails
       console.error("Error assigning privileges:", error);
       toast.error("Failed to assign privileges. Please try again later.");
     }
+  };
+
+  // Function to handle clearing all states and checkboxes
+  const handleClear = () => {
+    setSelectedRole("");
+    setFormErrors({ role: null });
+    setFormData({ role: null });
+    setUserPrivileges(initialUserPrivileges);
   };
 
   return (
@@ -108,18 +200,34 @@ const Privilege = () => {
                   <Row className="mb-3">
                     <Col md={4}>
                       <FormGroup>
-                        <label>User Type</label>
-                        <Input
-                          type="select"
-                          name="userType"
-                          value={userType}
-                          onChange={handleUserTypeChange}
-                        >
-                          <option value="">Select User Type</option>
-                          <option value="admin">Admin</option>
-                          <option value="manager">Manager</option>
-                          <option value="employee">Employee</option>
-                        </Input>
+                        <Label for="role">Role</Label>
+                        <InputGroup className="input-group-alternative mb-2">
+                          {fetchrole && fetchrole.length > 0 ? (
+                            <Input
+                              type="select"
+                              name="role"
+                              id="role"
+                              value={selectedRole || ""}
+                              onChange={handleRoleChange}
+                            >
+                              <option key="" value="">
+                                Select Role
+                              </option>
+                              {fetchrole.map((role) => (
+                                <option key={role.role_id} value={role.role_id}>
+                                  {role.role_name}
+                                </option>
+                              ))}
+                            </Input>
+                          ) : (
+                            <div>No roles available</div>
+                          )}
+                        </InputGroup>
+                        {formErrors.role && (
+                          <small className="text-danger">
+                            {formErrors.role}
+                          </small>
+                        )}
                       </FormGroup>
                     </Col>
                   </Row>
@@ -221,9 +329,18 @@ const Privilege = () => {
                       ))}
                     </tbody>
                   </Table>
-                  <Button color="primary" onClick={handleSubmit}>
-                    Save Privileges
-                  </Button>
+                  <div className="d-flex justify-content-center mt-4">
+                    <Button color="primary" onClick={handleSubmit}>
+                      Save Privileges
+                    </Button>
+                    <Button
+                      color="danger"
+                      className="ml-3"
+                      onClick={handleClear}
+                    >
+                      Clear
+                    </Button>
+                  </div>
                 </Form>
               </CardBody>
             </Card>

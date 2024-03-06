@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import CommonHeader from "components/Headers/CommonHeader";
-import Grid from "components/ag-grid/Grid";
+import CommonHeader from "../components/Headers/CommonHeader";
+import Grid from "../components/Ag-grid/Grid";
 import {
   Card,
   CardHeader,
@@ -27,7 +27,7 @@ const Currency = () => {
   const [error, setError] = useState(false);
   const [editedCurrencyId, setEditedCurrencyId] = useState(null);
   const [rowData, setRowData] = useState([]);
-  const [isEdit, setIsEdit] = useState(false); 
+  const [isEdit, setIsEdit] = useState(false);
   const [formErrors, setFormErrors] = useState({
     currency_name: "",
     currency_abbreviation: "",
@@ -216,7 +216,7 @@ const Currency = () => {
                       </InputGroupAddon>
                       <Input
                         placeholder="Currency Name"
-                        type="text" 
+                        type="text"
                         name="currency_name"
                         value={formData.currency_name}
                         onChange={handleChange}
@@ -274,7 +274,7 @@ const Currency = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onView={handleView}
-                idKey="currency_Id" 
+                idKey="currency_Id"
               />
             </div>
           </Col>
@@ -285,7 +285,7 @@ const Currency = () => {
         isOpen={isViewModalOpen}
         onClose={handleCloseViewModal}
         data={selectedCurrencyDetails}
-        labelsMapping={labelsMapping} 
+        labelsMapping={labelsMapping}
       />
     </>
   );

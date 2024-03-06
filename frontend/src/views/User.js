@@ -15,11 +15,12 @@ import {
   CustomInput,
 } from "reactstrap";
 import Select from "react-select";
-import Grid from "./../components/ag-grid/Grid";
+import Grid from "../components/Ag-grid/Grid";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ViewModal from "components/Modal/Modal";
+import axiosInstance from "./../helper/axios";
 
 const User = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -277,7 +278,7 @@ const User = () => {
         fetchRoles(),
         fetchUserTypes(),
         fetchSellers(),
-        axios.get("/user"),
+        axiosInstance.get("/user"),
       ]);
 
       setRowData(userData.data.data);

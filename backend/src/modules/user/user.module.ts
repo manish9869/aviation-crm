@@ -22,6 +22,9 @@ import { Category } from './entities/category.entity';
 import { Fleet } from './entities/fleet.entity';
 import { FleetService } from './service/fleet/fleet.service';
 import { FleetController } from './controller/fleet/fleet.controller';
+import { Privileges } from './entities/privileges.entity';
+import { PrivilegesController } from './controller/privileges/privileges.controller';
+import { PrivilegesService } from './service/privileges/privileges.service';
 
 @Module({
   imports: [
@@ -34,6 +37,7 @@ import { FleetController } from './controller/fleet/fleet.controller';
       Currency,
       Category,
       Fleet,
+      Privileges,
     ]),
   ],
   controllers: [
@@ -44,6 +48,7 @@ import { FleetController } from './controller/fleet/fleet.controller';
     CurrencyController,
     CategoryController,
     FleetController,
+    PrivilegesController,
   ],
   providers: [
     Logger,
@@ -54,6 +59,7 @@ import { FleetController } from './controller/fleet/fleet.controller';
     CurrencyService,
     CategoryService,
     FleetService,
+    PrivilegesService,
   ],
   exports: [
     RolesService,
@@ -63,6 +69,7 @@ import { FleetController } from './controller/fleet/fleet.controller';
     CurrencyService,
     CategoryService,
     FleetService,
+    PrivilegesService,
   ],
 })
 export class UserModule {}

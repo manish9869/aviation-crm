@@ -8,6 +8,7 @@ import {
 import { Roles } from './roles.entity';
 import { UserType } from './user-type.entity';
 import { Seller } from './seller.entity';
+import { Privileges } from './privileges.entity';
 
 @Entity({ name: 'login_user' })
 export class User {

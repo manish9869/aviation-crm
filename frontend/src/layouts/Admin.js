@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
 import { Container } from "reactstrap";
@@ -6,13 +6,30 @@ import { Container } from "reactstrap";
 import AdminNavbar from "components/Navbars/AdminNavbar.js";
 import AdminFooter from "components/Footers/AdminFooter.js";
 import Sidebar from "components/Sidebar/Sidebar.js";
+import { AuthContext } from "../components/Auth/AuthContext";
 
 import routes from "routes.js";
 
 const Admin = (props) => {
+  const { userData } = useContext(AuthContext);
+
   const mainContent = React.useRef(null);
   const location = useLocation();
 
+  const hasReadAccess = (path) => {
+    if (!userData || !userData.role || !userData.role.privileges[0].privileges)
+      return false; // No privileges available
+
+    const privileges = userData.role.privileges[0].privileges;
+
+    for (let i = 0; i < privileges.length; i++) {
+      const privilege = privileges[i];
+      if ("/" + privilege.path === path && privilege.access_config.read) {
+        return true;
+      }
+    }
+    return false;
+  };
   React.useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
@@ -21,14 +38,14 @@ const Admin = (props) => {
 
   const getRoutes = (routes) => {
     return routes.reduce((acc, prop, key) => {
-      if (prop.layout === "/admin") {
+      if (prop.layout === "/admin" && hasReadAccess(prop.path)) {
         acc.push(
           <Route path={prop.path} element={prop.component} key={key} exact />
         );
       }
       if (prop.sub_menu && prop.sub_menu.length > 0) {
         prop.sub_menu.forEach((subItem, subKey) => {
-          if (subItem.layout === "/admin") {
+          if (subItem.layout === "/admin" && hasReadAccess(subItem.path)) {
             acc.push(
               <Route
                 path={subItem.path}
@@ -61,6 +78,7 @@ const Admin = (props) => {
       <Sidebar
         {...props}
         routes={routes}
+        userData={userData}
         logo={{
           innerLink: "/admin/index",
           imgSrc: require("../assets/img/brand/argon-react.png"),

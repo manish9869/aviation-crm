@@ -1,11 +1,8 @@
-
-
 // reactstrap components
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import {
   Button,
   Card,
-  CardHeader,
   CardBody,
   FormGroup,
   Form,
@@ -18,21 +15,32 @@ import {
 } from "reactstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { AuthContext } from "../components/Auth/AuthContext";
 const Login = () => {
+  const { setUserData } = useContext(AuthContext);
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user data exists in local storage
+    const storedUserData = localStorage.getItem("userData");
+    if (storedUserData) {
+      setUserData(JSON.parse(storedUserData));
+      navigate("/admin/index");
+    }
+  }, [setUserData, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     await axios
       .post("/auth/login", {
-        email,
+        username: email,
         password,
       })
       .then((result) => {
-        console.log(result);
+        setUserData(result.data.data);
+        localStorage.setItem("userData", JSON.stringify(result.data.data));
         localStorage.setItem("accessToken", result.data.data.access_token);
         navigate("/admin/index");
       })
